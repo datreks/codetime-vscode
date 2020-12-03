@@ -1,5 +1,5 @@
 {
-  "name": "codetime",
+	"name": "codetime",
 	"displayName": "codetime",
 	"description": "codetime vscode plugin",
 	"version": "0.0.1",
@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:codetime.helloWorld"
+		"onStartupFinished"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
