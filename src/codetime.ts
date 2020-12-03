@@ -4,10 +4,10 @@ export class CodeTime {
     vscode.StatusBarAlignment.Left
   );
   public disposable!: vscode.Disposable;
-
   constructor() {
     this.init();
   }
+
   private init(): void {
     this.statusBar.text = "$(clock) Hello, Code Time!";
     this.statusBar.show();
@@ -20,7 +20,20 @@ export class CodeTime {
     vscode.window.onDidChangeWindowState(this.onFocus, this, events);
     vscode.window.onDidChangeTextEditorViewColumn(this.onCol, this, events);
     vscode.workspace.onDidSaveTextDocument(this.onSave, this, events);
+    vscode.workspace.onDidChangeTextDocument(this.onEdit, this, events);
     this.disposable = vscode.Disposable.from(...events);
+  }
+  private onEdit(e: vscode.TextDocumentChangeEvent) {
+    console.log(e.contentChanges);
+    if (
+      e.contentChanges.length === 1 &&
+      /\r\n|\n|\r/.test(e.contentChanges[0].text)
+    ) {
+      // TODO: Record new line
+      console.log("New Line");
+    }
+    console.log("edit");
+    this.onChange();
   }
   private onEditor() {
     console.log("change editor");
@@ -54,9 +67,18 @@ export class CodeTime {
         if (file) {
           let time: number = Date.now();
           console.log(workspaceName, lang, file, time);
+          // TODO: Record Edit
         }
       }
     }
+  }
+
+  private saveData() {
+    // TODO: Save Record Data In Local
+  }
+
+  private postData() {
+    // TODO: Post Record Data
   }
 
   public dispose() {
