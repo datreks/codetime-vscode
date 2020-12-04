@@ -1,5 +1,6 @@
 import got, { Got } from "got/dist/source";
 import * as vscode from "vscode";
+import * as os from "os";
 export class CodeTime {
   private statusBar: vscode.StatusBarItem = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left
@@ -68,19 +69,24 @@ export class CodeTime {
       let doc = editor.document;
       if (doc) {
         let lang: string = doc.languageId;
-        let originName = doc.fileName;
-        let file: string = vscode.workspace.asRelativePath(originName);
-        if (file === originName) {
-          file = "[othor workspace]";
+        let absoluteFilePath = doc.fileName;
+        let relativeFilePath: string = vscode.workspace.asRelativePath(
+          absoluteFilePath
+        );
+        if (relativeFilePath === absoluteFilePath) {
+          relativeFilePath = "[othor workspace]";
         }
-        if (file) {
+        if (relativeFilePath) {
           let time: number = Date.now();
-          console.log(workspaceName, lang, file, time);
+          console.log(workspaceName, lang, relativeFilePath, time);
           this.client.post(``, {
             json: {
               project: workspaceName,
               language: lang,
-              file: file,
+              relativeFile: relativeFilePath,
+              absoluteFile: absoluteFilePath,
+              editor: "VSCode",
+              platform: os.platform(),
             },
           });
           // TODO: Record Edit
