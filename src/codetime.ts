@@ -1,6 +1,7 @@
 import got, { Got } from "got/dist/source";
 import * as vscode from "vscode";
 import * as os from "os";
+import * as events from "./events";
 export class CodeTime {
   private statusBar: vscode.StatusBarItem = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left
@@ -13,7 +14,7 @@ export class CodeTime {
     this.state = state;
     this.init();
     this.client = got.extend({
-      prefixUrl: "https://enzefpudzpxmzxq.m.pipedream.net",
+      prefixUrl: "http://codetime.si9ma.com:5000",
       responseType: "json",
     });
   }
@@ -28,40 +29,30 @@ export class CodeTime {
     let events: vscode.Disposable[] = [];
     vscode.window.onDidChangeActiveTextEditor(this.onEditor, this, events);
     vscode.window.onDidChangeWindowState(this.onFocus, this, events);
-    vscode.window.onDidChangeTextEditorViewColumn(this.onCol, this, events);
     vscode.workspace.onDidSaveTextDocument(this.onSave, this, events);
     vscode.workspace.onDidChangeTextDocument(this.onEdit, this, events);
     this.disposable = vscode.Disposable.from(...events);
   }
   private onEdit(e: vscode.TextDocumentChangeEvent) {
-    console.log(e.contentChanges);
+    let eventName = events.FILE_EDITED;
     if (
       e.contentChanges.length === 1 &&
       /\r\n|\n|\r/.test(e.contentChanges[0].text)
     ) {
-      // TODO: Record new line
-      console.log("New Line");
+      eventName = events.FILE_ADDED_LINE;
     }
-    console.log("edit");
-    this.onChange();
+    this.onChange(eventName);
   }
-  private onEditor() {
-    console.log("change editor");
-    this.onChange();
+  private onEditor(e: vscode.TextEditor | undefined) {
+    this.onChange(events.ACTIVATE_FILE_CHANGED);
   }
-  private onFocus() {
-    console.log("change focus");
-    this.onChange();
+  private onFocus(e: vscode.WindowState) {
+    this.onChange(events.EDITOR_CHANGED);
   }
-  private onCol() {
-    console.log("change column");
-    this.onChange();
+  private onSave(e: vscode.TextDocument) {
+    this.onChange(events.FILE_SAVED);
   }
-  private onSave() {
-    console.log("save file");
-    this.onChange();
-  }
-  private onChange() {
+  private onChange(eventName = "unknown") {
     let editor = vscode.window.activeTextEditor;
     let workspaceName = vscode.workspace.name;
     let workspaceRoot = vscode.workspace.rootPath;
@@ -78,18 +69,20 @@ export class CodeTime {
         }
         if (relativeFilePath) {
           let time: number = Date.now();
-          console.log(workspaceName, lang, relativeFilePath, time);
-          this.client.post(``, {
-            json: {
-              project: workspaceName,
-              language: lang,
-              relativeFile: relativeFilePath,
-              absoluteFile: absoluteFilePath,
-              editor: "VSCode",
-              platform: os.platform(),
-            },
-          });
-          // TODO: Record Edit
+          let data = {
+            project: workspaceName,
+            language: lang,
+            relativeFile: relativeFilePath,
+            absoluteFile: absoluteFilePath,
+            editor: "VSCode",
+            platform: os.platform(),
+            userID: 2,
+            eventTime: time,
+            eventType: eventName,
+          };
+          console.log(workspaceName, lang, relativeFilePath, time, eventName);
+          // Post data
+          this.client.post(`eventLog`, { json: data });
         }
       }
     }
