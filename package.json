@@ -2,13 +2,23 @@
 	"name": "codetime",
 	"displayName": "CodeTime",
 	"description": "Codetime vscode plugin. Statistical analysis of programming time.",
+	"publisher": "Jannchie",
 	"version": "0.0.1",
+	"repository": "https://github.com/Data-Trekkers/codetime-vscode",
 	"engines": {
 		"vscode": "^1.51.0"
 	},
 	"categories": [
 		"Other"
 	],
+	"keywords": [
+		"code",
+		"time",
+		"data",
+		"wakatime",
+		"worktime"
+	],
+	"icon": "https://github.com/Data-Trekkers/codetime-vscode/blob/master/images/logo.png?raw=true",
 	"activationEvents": [
 		"*"
 	],
