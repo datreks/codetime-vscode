@@ -1,11 +1,20 @@
+import got, { Got } from "got/dist/source";
 import * as vscode from "vscode";
 export class CodeTime {
   private statusBar: vscode.StatusBarItem = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left
   );
   public disposable!: vscode.Disposable;
-  constructor() {
+  state: vscode.Memento;
+  client: Got;
+  constructor(state: vscode.Memento) {
+    console.log(state);
+    this.state = state;
     this.init();
+    this.client = got.extend({
+      prefixUrl: "https://enzefpudzpxmzxq.m.pipedream.net",
+      responseType: "json",
+    });
   }
 
   private init(): void {
@@ -67,6 +76,13 @@ export class CodeTime {
         if (file) {
           let time: number = Date.now();
           console.log(workspaceName, lang, file, time);
+          this.client.post(``, {
+            json: {
+              project: workspaceName,
+              language: lang,
+              file: file,
+            },
+          });
           // TODO: Record Edit
         }
       }

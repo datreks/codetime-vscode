@@ -6,7 +6,7 @@ import * as vscode from "vscode";
 let codetime: CodeTime;
 
 export function activate(context: vscode.ExtensionContext) {
-  codetime = new CodeTime();
+  codetime = new CodeTime(context.globalState);
 }
 export function deactivate() {
   if (codetime) {
