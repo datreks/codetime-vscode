@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import * as os from "os";
 import * as events from "./events";
 import { getDurationText } from "./getDurationText";
+import { v4 } from "uuid";
 export class CodeTime {
   private statusBar: vscode.StatusBarItem = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left
@@ -12,6 +13,7 @@ export class CodeTime {
   client: Got;
   userId: number;
   inter!: NodeJS.Timeout;
+  session: string;
   constructor(state: vscode.Memento) {
     console.log(state);
     this.state = state;
@@ -20,6 +22,7 @@ export class CodeTime {
       prefixUrl: "http://codetime.si9ma.com:5000",
       responseType: "json",
     });
+    this.session = v4();
     this.init();
   }
   getUserId(): number {
@@ -98,6 +101,10 @@ export class CodeTime {
             userID: this.userId,
             eventTime: time,
             eventType: eventName,
+            sessionID: this.session,
+            platformVersion: os.release(),
+            platformArch: os.arch(),
+            editorVersion: vscode.version,
           };
           console.log(workspaceName, lang, relativeFilePath, time, eventName);
           // Post data
