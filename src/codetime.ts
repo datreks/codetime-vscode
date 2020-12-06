@@ -5,6 +5,25 @@ import * as events from "./events";
 import { getDurationText } from "./getDurationText";
 import { v4 } from "uuid";
 export class CodeTime {
+  setToken() {
+    vscode.window
+      .showInputBox({
+        password: true,
+        placeHolder: "Code Time: 输入你的Token",
+      })
+      .then((token) => {
+        if (token && this.isToken(token)) {
+          this.state.update("token", token);
+          this.token = token;
+          this.getCurrentDuration();
+        } else {
+          vscode.window.showErrorMessage("Token格式验证失败");
+          this.statusBar.text = "$(clock) Code Time: 未能获取Token";
+          this.statusBar.command = "codetime.getToken";
+          this.token = "";
+        }
+      });
+  }
   private statusBar: vscode.StatusBarItem = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left
   );
@@ -12,12 +31,14 @@ export class CodeTime {
   state: vscode.Memento;
   client: Got;
   userId: number;
+  token: string = "";
   inter!: NodeJS.Timeout;
   session: string;
   constructor(state: vscode.Memento) {
     console.log(state);
     this.state = state;
     this.userId = this.getUserId();
+    this.initSetToken();
     this.client = got.extend({
       prefixUrl: "http://codetime.si9ma.com:5000",
       responseType: "json",
@@ -29,8 +50,22 @@ export class CodeTime {
     return 2;
   }
 
+  isToken(token: string) {
+    return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+      token
+    );
+  }
+
+  initSetToken() {
+    let token: string | undefined = this.state.get("token");
+    this.token = token ? token : "";
+    if (this.token === "") {
+      this.setToken();
+    }
+  }
+
   private init(): void {
-    this.statusBar.text = "$(clock) Hello, Code Time!";
+    this.statusBar.text = "$(clock) Code Time: 正在初始化...";
     this.statusBar.show();
     this.setupEventListeners();
     this.getCurrentDuration();
@@ -115,6 +150,13 @@ export class CodeTime {
   }
 
   private getCurrentDuration() {
+    if (this.token === "") {
+      this.statusBar.text = "$(clock) Code Time: 未能获取Token";
+      this.statusBar.command = "codetime.getToken";
+      return;
+    }
+    this.statusBar.command = "codetime.toDashboard";
+    this.statusBar.tooltip = "前往仪表盘查看统计数据";
     this.client
       .get(`stats/editor?userID=${this.userId}`)
       .then((res: Response) => {
@@ -137,18 +179,10 @@ export class CodeTime {
         console.error(e);
       });
   }
-  private saveData() {
-    // TODO: Save Record Data In Local
-  }
-
-  private postData() {
-    // TODO: Post Record Data
-  }
 
   public dispose() {
     this.statusBar.dispose();
     this.disposable.dispose();
     clearInterval(this.inter);
-    // clearTimeout(this.getCodingActivityTimeout);
   }
 }

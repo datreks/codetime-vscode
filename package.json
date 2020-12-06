@@ -24,16 +24,16 @@
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
-		"configuration": {
-			"title": "token",
-			"properties": {
-				"codetime.token": {
-					"type": "string",
-					"default": "",
-					"description": "Token data used to validate user information."
-				}
+		"commands": [
+			{
+				"command": "codetime.getToken",
+				"title": "Code Time: 输入Token"
+			},
+			{
+				"command": "codetime.toDashboard",
+				"title": "Code Time: 查看统计数据"
 			}
-		}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run package",

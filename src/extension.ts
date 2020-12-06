@@ -7,6 +7,13 @@ let codetime: CodeTime;
 
 export function activate(context: vscode.ExtensionContext) {
   codetime = new CodeTime(context.globalState);
+  vscode.commands.registerCommand("codetime.getToken", () => {
+    codetime.setToken();
+  });
+  vscode.commands.registerCommand("codetime.toDashboard", () => {
+    let url = `https://codetime.netlify.app/dashboard`;
+    vscode.env.openExternal(vscode.Uri.parse(url));
+  });
 }
 export function deactivate() {
   if (codetime) {
