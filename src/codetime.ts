@@ -1,4 +1,4 @@
-import got, { Got, Response } from "got/dist/source";
+import got, { Got, HTTPError, Response } from "got/dist/source";
 import * as vscode from "vscode";
 import * as os from "os";
 import * as events from "./events";
@@ -40,8 +40,15 @@ export class CodeTime {
     this.userId = this.getUserId();
     this.initSetToken();
     this.client = got.extend({
-      prefixUrl: "http://codetime.si9ma.com:5000",
+      prefixUrl: "https://codetime.si9ma.com",
       responseType: "json",
+      hooks: {
+        beforeRequest: [
+          async (options) => {
+            options.headers.token = this.token;
+          },
+        ],
+      },
     });
     this.session = v4();
     this.init();
@@ -143,7 +150,15 @@ export class CodeTime {
           };
           console.log(workspaceName, lang, relativeFilePath, time, eventName);
           // Post data
-          this.client.post(`eventLog`, { json: data });
+          this.client.post(`eventLog`, { json: data }).catch((e: HTTPError) => {
+            if (e.response.statusCode === 400) {
+              this.statusBar.text = "$(clock) Code Time: Token无效";
+              this.statusBar.command = "codetime.getToken";
+            } else {
+              this.statusBar.text = "$(clock) Code Time: 暂时无法连接服务器";
+              this.statusBar.command = "codetime.toDashboard";
+            }
+          });
         }
       }
     }
@@ -175,8 +190,14 @@ export class CodeTime {
         }
         this.statusBar.text = txt;
       })
-      .catch((e) => {
-        console.error(e);
+      .catch((e: HTTPError) => {
+        if (e.response.statusCode === 400) {
+          this.statusBar.text = "$(clock) Code Time: Token无效";
+          this.statusBar.command = "codetime.getToken";
+        } else {
+          this.statusBar.text = "$(clock) Code Time: 暂时无法连接服务器";
+          this.statusBar.command = "codetime.toDashboard";
+        }
       });
   }
 
