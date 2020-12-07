@@ -4,6 +4,11 @@ All notable changes to the "CodeTime" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.0.5] - 2020-12-07
+
+- Enable set user's token
+- Enable jump to the dashboard
+
 ## [0.0.4] - 2020-12-06
 
 - Update logo
