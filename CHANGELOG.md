@@ -4,6 +4,11 @@ All notable changes to the "CodeTime" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.0.6] - 2020-12-11
+
+- Update api server
+- Update readme
+
 ## [0.0.5] - 2020-12-07
 
 - Enable set user's token
