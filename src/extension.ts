@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
     codetime.setToken();
   });
   vscode.commands.registerCommand("codetime.toDashboard", () => {
-    let url = `https://codetime.netlify.app/dashboard`;
+    let url = `https://codetime.datreks.com/dashboard`;
     vscode.env.openExternal(vscode.Uri.parse(url));
   });
 }

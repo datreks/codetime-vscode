@@ -1,3 +1,3 @@
 # CodeTime
 
-Codetime vscode plugin. Statistical analysis of programming time.
+CodeTime vscode plugin. Statistical analysis of programming time.

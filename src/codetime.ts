@@ -40,7 +40,7 @@ export class CodeTime {
     this.userId = this.getUserId();
     this.initSetToken();
     this.client = got.extend({
-      prefixUrl: "https://codetime.si9ma.com",
+      prefixUrl: "https://codetime-api.datreks.com",
       responseType: "json",
       hooks: {
         beforeRequest: [
@@ -140,7 +140,6 @@ export class CodeTime {
             absoluteFile: absoluteFilePath,
             editor: "VSCode",
             platform: os.platform(),
-            userID: this.userId,
             eventTime: time,
             eventType: eventName,
             sessionID: this.session,
