@@ -9,7 +9,7 @@ export class CodeTime {
     vscode.window
       .showInputBox({
         password: true,
-        placeHolder: "Code Time: 输入你的Token",
+        placeHolder: "Code Time: Input Your Token",
       })
       .then((token) => {
         if (token && this.isToken(token)) {
@@ -17,8 +17,8 @@ export class CodeTime {
           this.token = token;
           this.getCurrentDuration();
         } else {
-          vscode.window.showErrorMessage("Token格式验证失败");
-          this.statusBar.text = "$(clock) Code Time: 未能获取Token";
+          vscode.window.showErrorMessage("Token validation failed");
+          this.statusBar.text = "$(clock) Code Time: Cannot Get Token";
           this.statusBar.command = "codetime.getToken";
           this.token = "";
         }
@@ -72,7 +72,7 @@ export class CodeTime {
   }
 
   private init(): void {
-    this.statusBar.text = "$(clock) Code Time: 正在初始化...";
+    this.statusBar.text = "$(clock) Code Time: Initializing...";
     this.statusBar.show();
     this.setupEventListeners();
     this.getCurrentDuration();
@@ -151,10 +151,11 @@ export class CodeTime {
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((e: HTTPError) => {
             if (e.response.statusCode === 400) {
-              this.statusBar.text = "$(clock) Code Time: Token无效";
+              this.statusBar.text = "$(clock) Code Time: Token invalid";
               this.statusBar.command = "codetime.getToken";
             } else {
-              this.statusBar.text = "$(clock) Code Time: 暂时无法连接服务器";
+              this.statusBar.text =
+                "$(clock) Code Time: Temporarily disconnect";
               this.statusBar.command = "codetime.toDashboard";
             }
           });
@@ -165,12 +166,12 @@ export class CodeTime {
 
   private getCurrentDuration() {
     if (this.token === "") {
-      this.statusBar.text = "$(clock) Code Time: 未能获取Token";
+      this.statusBar.text = "$(clock) Code Time: Without Token";
       this.statusBar.command = "codetime.getToken";
       return;
     }
     this.statusBar.command = "codetime.toDashboard";
-    this.statusBar.tooltip = "前往仪表盘查看统计数据";
+    this.statusBar.tooltip = "Head to the dashboard for statistics";
     this.client
       .get(`stats/editor?userID=${this.userId}`)
       .then((res: Response) => {
@@ -191,10 +192,10 @@ export class CodeTime {
       })
       .catch((e: HTTPError) => {
         if (e.response.statusCode === 400) {
-          this.statusBar.text = "$(clock) Code Time: Token无效";
+          this.statusBar.text = "$(clock) Code Time: Token invalid";
           this.statusBar.command = "codetime.getToken";
         } else {
-          this.statusBar.text = "$(clock) Code Time: 暂时无法连接服务器";
+          this.statusBar.text = "$(clock) Code Time: Temporarily disconnect";
           this.statusBar.command = "codetime.toDashboard";
         }
       });

@@ -4,6 +4,14 @@ All notable changes to the "CodeTime" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.0.8] - 2020-12-19
+
+- internationalization: commands description
+
+## [0.0.7] - 2020-12-19
+
+- internationalization: stat bar information
+
 ## [0.0.6] - 2020-12-11
 
 - Update api server

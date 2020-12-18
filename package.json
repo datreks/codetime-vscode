@@ -3,7 +3,7 @@
 	"displayName": "CodeTime",
 	"description": "Codetime vscode plugin. Statistical analysis of programming time.",
 	"publisher": "Jannchie",
-	"version": "0.0.6",
+	"version": "0.0.8",
 	"repository": "https://github.com/Data-Trekkers/codetime-vscode",
 	"engines": {
 		"vscode": "^1.51.0"
@@ -16,6 +16,8 @@
 		"time",
 		"data",
 		"wakatime",
+		"code time",
+		"codetime",
 		"worktime"
 	],
 	"icon": "images/logo.png",
@@ -27,11 +29,11 @@
 		"commands": [
 			{
 				"command": "codetime.getToken",
-				"title": "Code Time: 输入Token"
+				"title": "Code Time: Enter Token"
 			},
 			{
 				"command": "codetime.toDashboard",
-				"title": "Code Time: 查看统计数据"
+				"title": "Code Time: Browse Dashboard"
 			}
 		]
 	},
