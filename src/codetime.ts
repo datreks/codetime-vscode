@@ -9,7 +9,7 @@ export class CodeTime {
     vscode.window
       .showInputBox({
         password: true,
-        placeHolder: "Code Time: Input Your Token",
+        placeHolder: "Code Time: Input Your Token (from: codetime.datreks.com)",
       })
       .then((token) => {
         if (token && this.isToken(token)) {
@@ -19,6 +19,7 @@ export class CodeTime {
         } else {
           vscode.window.showErrorMessage("Token validation failed");
           this.statusBar.text = "$(clock) Code Time: Cannot Get Token";
+          this.statusBar.tooltip = "Enter Token";
           this.statusBar.command = "codetime.getToken";
           this.token = "";
         }
@@ -150,8 +151,12 @@ export class CodeTime {
           console.log(workspaceName, lang, relativeFilePath, time, eventName);
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((e: HTTPError) => {
-            if (e.response.statusCode === 400) {
+            if (
+              e.response.statusCode === 400 ||
+              e.response.statusCode === 403
+            ) {
               this.statusBar.text = "$(clock) Code Time: Token invalid";
+              this.statusBar.tooltip = "Enter Token";
               this.statusBar.command = "codetime.getToken";
             } else {
               this.statusBar.text =
@@ -167,6 +172,7 @@ export class CodeTime {
   private getCurrentDuration() {
     if (this.token === "") {
       this.statusBar.text = "$(clock) Code Time: Without Token";
+      this.statusBar.tooltip = "Enter Token";
       this.statusBar.command = "codetime.getToken";
       return;
     }
@@ -191,8 +197,9 @@ export class CodeTime {
         this.statusBar.text = txt;
       })
       .catch((e: HTTPError) => {
-        if (e.response.statusCode === 400) {
+        if (e.response.statusCode === 400 || e.response.statusCode === 403) {
           this.statusBar.text = "$(clock) Code Time: Token invalid";
+          this.statusBar.tooltip = "Enter Token";
           this.statusBar.command = "codetime.getToken";
         } else {
           this.statusBar.text = "$(clock) Code Time: Temporarily disconnect";

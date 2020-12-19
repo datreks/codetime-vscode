@@ -2,15 +2,17 @@
 
 All notable changes to the "CodeTime" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.0.9] - 2020-12-20
+
+- Fix: More friendly token authentication
 
 ## [0.0.8] - 2020-12-19
 
-- internationalization: commands description
+- Internationalization: commands description
 
 ## [0.0.7] - 2020-12-19
 
-- internationalization: stat bar information
+- Internationalization: stat bar information
 
 ## [0.0.6] - 2020-12-11
 
@@ -30,7 +32,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.3] - 2020-12-05
 
 - Update logo
-- Watch user create file, limit post edit record.
+- Watch user create file, limit post edit record
 
 ## [0.0.2] - 2020-12-04
 
