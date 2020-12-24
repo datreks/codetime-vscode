@@ -191,9 +191,9 @@ export class CodeTime {
           sumDuration += d.duration;
         }
         let txt = `$(watch) Code Time: ${getDurationText(sumDuration)}`;
-        if (cEditorDuration !== sumDuration) {
-          txt += `(${getDurationText(cEditorDuration)})`;
-        }
+        // if (cEditorDuration !== sumDuration) {
+        //   txt += `(${getDurationText(cEditorDuration)})`;
+        // }
         this.statusBar.text = txt;
       })
       .catch((e: HTTPError) => {

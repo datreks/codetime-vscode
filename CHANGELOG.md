@@ -2,6 +2,10 @@
 
 All notable changes to the "CodeTime" extension will be documented in this file.
 
+## [0.0.10] - 2020-12-24
+
+- Style: Hide editor time
+
 ## [0.0.9] - 2020-12-20
 
 - Fix: More friendly token authentication
