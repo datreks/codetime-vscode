@@ -1,5 +1,8 @@
 # CodeTime
 
+![](https://img.shields.io/visual-studio-marketplace/stars/Jannchie.codetime)
+![](https://img.shields.io/visual-studio-marketplace/i/Jannchie.codetime)
+
 CodeTime vscode plugin. Statistical analysis of programming time.
 
 Web Site: [Code Time](https://codetime.datreks.com)
