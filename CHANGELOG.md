@@ -2,6 +2,10 @@
 
 All notable changes to the "CodeTime" extension will be documented in this file.
 
+## [0.0.12] - 2020-01-09
+
+- Fix: Performance on Windows
+
 ## [0.0.11] - 2020-01-08
 
 - Beautify stat bar info and icon

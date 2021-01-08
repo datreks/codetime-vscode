@@ -6,6 +6,7 @@ import { getDurationText } from "./getDurationText";
 import { v4 } from "uuid";
 import osName = require("os-name");
 export class CodeTime {
+  osName = osName();
   setToken() {
     vscode.window
       .showInputBox({
@@ -141,7 +142,7 @@ export class CodeTime {
             relativeFile: relativeFilePath,
             absoluteFile: absoluteFilePath,
             editor: "VSCode",
-            platform: osName(),
+            platform: this.osName,
             eventTime: time,
             eventType: eventName,
             sessionID: this.session,
