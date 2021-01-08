@@ -4,7 +4,11 @@
 	"description": "Codetime vscode plugin. Statistical analysis of programming time.",
 	"publisher": "Jannchie",
 	"version": "0.0.10",
-	"repository": "https://github.com/Data-Trekkers/codetime-vscode",
+	"homepage": "https://github.com/Data-Trekkers/codetime-vscode#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Data-Trekkers/codetime-vscode"
+	},
 	"engines": {
 		"vscode": "^1.51.0"
 	},
@@ -67,6 +71,7 @@
 	"dependencies": {
 		"@types/uuid": "^8.3.0",
 		"got": "^11.8.0",
+		"os-name": "^4.0.0",
 		"uuid": "^8.3.1"
 	}
 }

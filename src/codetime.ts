@@ -4,6 +4,7 @@ import * as os from "os";
 import * as events from "./events";
 import { getDurationText } from "./getDurationText";
 import { v4 } from "uuid";
+import osName = require("os-name");
 export class CodeTime {
   setToken() {
     vscode.window
@@ -120,7 +121,7 @@ export class CodeTime {
   private onChange(eventName = "unknown") {
     let editor = vscode.window.activeTextEditor;
     let workspaceName = vscode.workspace.name;
-    let workspaceRoot = vscode.workspace.rootPath;
+    let workspaceRoot = vscode.workspace.workspaceFolders;
     if (workspaceRoot && editor) {
       let doc = editor.document;
       if (doc) {
@@ -140,7 +141,7 @@ export class CodeTime {
             relativeFile: relativeFilePath,
             absoluteFile: absoluteFilePath,
             editor: "VSCode",
-            platform: os.platform(),
+            platform: osName(),
             eventTime: time,
             eventType: eventName,
             sessionID: this.session,
@@ -148,14 +149,14 @@ export class CodeTime {
             platformArch: os.arch(),
             editorVersion: vscode.version,
           };
-          console.log(workspaceName, lang, relativeFilePath, time, eventName);
+          console.log(data);
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((e: HTTPError) => {
             if (
               e.response.statusCode === 400 ||
               e.response.statusCode === 403
             ) {
-              this.statusBar.text = "$(clock) Code Time: Token invalid";
+              this.statusBar.text = "$(alert) Code Time: Token invalid";
               this.statusBar.tooltip = "Enter Token";
               this.statusBar.command = "codetime.getToken";
             } else {
@@ -177,7 +178,7 @@ export class CodeTime {
       return;
     }
     this.statusBar.command = "codetime.toDashboard";
-    this.statusBar.tooltip = "Head to the dashboard for statistics";
+    this.statusBar.tooltip = "Code Time: Head to the dashboard for statistics";
     this.client
       .get(`stats/editor?userID=${this.userId}`)
       .then((res: Response) => {
@@ -190,7 +191,7 @@ export class CodeTime {
           }
           sumDuration += d.duration;
         }
-        let txt = `$(watch) Code Time: ${getDurationText(sumDuration)}`;
+        let txt = `$(watch) ${getDurationText(sumDuration)}`;
         // if (cEditorDuration !== sumDuration) {
         //   txt += `(${getDurationText(cEditorDuration)})`;
         // }

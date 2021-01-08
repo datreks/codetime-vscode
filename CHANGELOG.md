@@ -2,6 +2,12 @@
 
 All notable changes to the "CodeTime" extension will be documented in this file.
 
+## [0.0.11] - 2020-01-08
+
+- Beautify stat bar info and icon
+- Upload a more detailed platform name
+- Update previews
+
 ## [0.0.10] - 2020-12-24
 
 - Style: Hide editor time
