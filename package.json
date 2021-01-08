@@ -3,7 +3,7 @@
 	"displayName": "CodeTime",
 	"description": "Codetime vscode plugin. Statistical analysis of programming time.",
 	"publisher": "Jannchie",
-	"version": "0.0.10",
+	"version": "0.0.11",
 	"homepage": "https://github.com/Data-Trekkers/codetime-vscode#readme",
 	"repository": {
 		"type": "git",
