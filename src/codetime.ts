@@ -17,9 +17,9 @@ export class CodeTime {
         if (token && this.isToken(token)) {
           this.state.update("token", token);
           this.token = token;
-          this.getCurrentDuration();
+          this.getCurrentDuration(true);
         } else {
-          vscode.window.showErrorMessage("Token validation failed");
+          vscode.window.showErrorMessage("Code Time: Token validation failed");
           this.statusBar.text = "$(clock) Code Time: Cannot Get Token";
           this.statusBar.tooltip = "Enter Token";
           this.statusBar.command = "codetime.getToken";
@@ -132,7 +132,7 @@ export class CodeTime {
           absoluteFilePath
         );
         if (relativeFilePath === absoluteFilePath) {
-          relativeFilePath = "[othor workspace]";
+          relativeFilePath = "[other workspace]";
         }
         if (relativeFilePath) {
           let time: number = Date.now();
@@ -149,8 +149,9 @@ export class CodeTime {
             platformVersion: os.release(),
             platformArch: os.arch(),
             editorVersion: vscode.version,
+            pluginVersion: "0.0.12",
+            plugin: "VSCode",
           };
-          console.log(data);
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((e: HTTPError) => {
             if (
@@ -171,7 +172,7 @@ export class CodeTime {
     }
   }
 
-  private getCurrentDuration() {
+  private getCurrentDuration(showSuccess = false) {
     if (this.token === "") {
       this.statusBar.text = "$(clock) Code Time: Without Token";
       this.statusBar.tooltip = "Enter Token";
@@ -197,6 +198,11 @@ export class CodeTime {
         //   txt += `(${getDurationText(cEditorDuration)})`;
         // }
         this.statusBar.text = txt;
+        if (showSuccess) {
+          vscode.window.showInformationMessage(
+            "Code Time: The Token validation was successful, you can see the code time data in dashboard after writing some code. It may take some time to process the data. Please wait for a while."
+          );
+        }
       })
       .catch((e: HTTPError) => {
         if (e.response.statusCode === 400 || e.response.statusCode === 403) {

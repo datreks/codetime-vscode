@@ -2,11 +2,15 @@
 
 All notable changes to the "CodeTime" extension will be documented in this file.
 
-## [0.0.12] - 2020-01-09
+## [0.0.13] - 2021-02-18
+
+- Feat: Add a notification of successful Token validation.
+
+## [0.0.12] - 2021-01-09
 
 - Fix: Performance on Windows
 
-## [0.0.11] - 2020-01-08
+## [0.0.11] - 2021-01-08
 
 - Beautify stat bar info and icon
 - Upload a more detailed platform name
