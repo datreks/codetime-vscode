@@ -2,6 +2,10 @@
 
 All notable changes to the "CodeTime" extension will be documented in this file.
 
+## [0.0.14] - 2021-02-26
+
+- Feat: Save log to local while the server is temporarily unavailable.
+
 ## [0.0.13] - 2021-02-18
 
 - Feat: Add a notification of successful Token validation.

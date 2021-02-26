@@ -5,6 +5,10 @@ import * as events from "./events";
 import { getDurationText } from "./getDurationText";
 import { v4 } from "uuid";
 import osName = require("os-name");
+import { appendFile, readFile, unlink } from "fs";
+
+const LOCAL_STORAGE_FILE_NAME = "TempCodetimeData";
+
 export class CodeTime {
   osName = osName();
   setToken() {
@@ -38,7 +42,6 @@ export class CodeTime {
   inter!: NodeJS.Timeout;
   session: string;
   constructor(state: vscode.Memento) {
-    console.log(state);
     this.state = state;
     this.userId = this.getUserId();
     this.initSetToken();
@@ -81,6 +84,7 @@ export class CodeTime {
     this.getCurrentDuration();
     this.inter = setInterval(() => {
       this.getCurrentDuration();
+      this.uploadLocalData();
     }, 60 * 1000);
   }
   private setupEventListeners(): void {
@@ -166,12 +170,57 @@ export class CodeTime {
                 "$(clock) Code Time: Temporarily disconnect";
               this.statusBar.command = "codetime.toDashboard";
             }
+            this.appendDataToLocal(data);
           });
         }
       }
     }
   }
 
+  private appendDataToLocal(data: {
+    project: string | undefined;
+    language: string;
+    relativeFile: string;
+    absoluteFile: string;
+    editor: string;
+    platform: string;
+    eventTime: number;
+    eventType: string;
+    sessionID: string;
+    platformVersion: string;
+    platformArch: string;
+    editorVersion: string;
+    pluginVersion: string;
+    plugin: string;
+  }) {
+    appendFile(LOCAL_STORAGE_FILE_NAME, JSON.stringify(data) + "\n", () => {});
+  }
+
+  private uploadLocalData() {
+    readFile(LOCAL_STORAGE_FILE_NAME, (_, data) => {
+      const dataList = data
+        .toString()
+        .split("\n")
+        .map((row) => this.tryParseJSON(row))
+        .filter((d) => d);
+      if (dataList.length > 0) {
+        this.client.post(`batchEventLog`, { json: dataList }).then(() => {
+          unlink(LOCAL_STORAGE_FILE_NAME, () => {
+            console.log(`sent batch event log: ${dataList.length} rows`);
+          });
+        });
+      }
+    });
+  }
+  private tryParseJSON(str: string) {
+    try {
+      const o = JSON.parse(str);
+      if (o && typeof o === "object") {
+        return o;
+      }
+    } catch (e) {}
+    return null;
+  }
   private getCurrentDuration(showSuccess = false) {
     if (this.token === "") {
       this.statusBar.text = "$(clock) Code Time: Without Token";
