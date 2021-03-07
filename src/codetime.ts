@@ -90,6 +90,11 @@ export class CodeTime {
     vscode.workspace.onDidSaveTextDocument(this.onSave, this, events);
     vscode.workspace.onDidChangeTextDocument(this.onEdit, this, events);
     vscode.workspace.onDidCreateFiles(this.onCreate, this, events);
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration("codetime")) {
+        this.getCurrentDuration();
+      }
+    });
     this.disposable = vscode.Disposable.from(...events);
   }
   private onEdit(e: vscode.TextDocumentChangeEvent) {
@@ -131,7 +136,7 @@ export class CodeTime {
           absoluteFilePath
         );
         if (relativeFilePath === absoluteFilePath) {
-          relativeFilePath = "[othor workspace]";
+          relativeFilePath = "[other workspace]";
         }
         if (relativeFilePath) {
           let time: number = Date.now();
@@ -171,6 +176,7 @@ export class CodeTime {
   }
 
   private getCurrentDuration() {
+    const key = vscode.workspace.getConfiguration("codetime").statusBarInfo;
     if (this.token === "") {
       this.statusBar.text = "$(clock) Code Time: Without Token";
       this.statusBar.tooltip = "Enter Token";
@@ -180,22 +186,29 @@ export class CodeTime {
     this.statusBar.command = "codetime.toDashboard";
     this.statusBar.tooltip = "Code Time: Head to the dashboard for statistics";
     this.client
-      .get(`stats/editor?userID=${this.userId}`)
+      .get(`stats?by=time`)
       .then((res: Response) => {
         let data = res.body as any;
-        let cEditorDuration: number = 0;
-        let sumDuration: number = 0;
-        for (let d of data.data) {
-          if (d.editor === "VSCode") {
-            cEditorDuration = d.duration;
-          }
-          sumDuration += d.duration;
+        const sumDuration = data.data.reduce((acc: any, cur: any) => {
+          return acc + cur.duration;
+        }, 0);
+        const avgDuration: number = sumDuration / data.data.length;
+        switch (key) {
+          case "average":
+            this.statusBar.text = `$(watch) ${getDurationText(avgDuration)}`;
+            break;
+          case "today":
+            this.statusBar.text = `$(watch) ${getDurationText(
+              data.data[data.data.length - 1].duration
+            )}`;
+            break;
+          default:
+            this.statusBar.text = `$(watch) ${getDurationText(sumDuration)}`;
+            break;
         }
-        let txt = `$(watch) ${getDurationText(sumDuration)}`;
         // if (cEditorDuration !== sumDuration) {
         //   txt += `(${getDurationText(cEditorDuration)})`;
         // }
-        this.statusBar.text = txt;
       })
       .catch((e: HTTPError) => {
         if (e.response.statusCode === 400 || e.response.statusCode === 403) {
@@ -206,6 +219,30 @@ export class CodeTime {
           this.statusBar.text = "$(clock) Code Time: Temporarily disconnect";
           this.statusBar.command = "codetime.toDashboard";
         }
+      });
+  }
+  public codeTimeInStatBar() {
+    vscode.window
+      .showQuickPick(
+        ["Total code time", "Average daily code time", "Today code time"],
+        {}
+      )
+      .then((v) => {
+        let key = "total";
+        switch (v) {
+          case "Average daily code time":
+            key = "average";
+            break;
+          case "Today code time":
+            key = "today";
+            break;
+          default:
+            break;
+        }
+        vscode.workspace
+          .getConfiguration("codetime")
+          .update("statusBarInfo", key, true)
+          .then(() => this.getCurrentDuration());
       });
   }
 

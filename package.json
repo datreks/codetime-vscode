@@ -33,13 +33,37 @@
 		"commands": [
 			{
 				"command": "codetime.getToken",
-				"title": "Code Time: Enter Token"
+				"title": "Code Time: Enter token"
 			},
 			{
 				"command": "codetime.toDashboard",
-				"title": "Code Time: Browse Dashboard"
+				"title": "Code Time: Browse dashboard"
+			},
+			{
+				"command": "codetime.codeTimeInStatusBar",
+				"title": "Code Time: Select status bar info"
 			}
-		]
+		],
+		"configuration": {
+			"title": "CodeTime",
+			"properties": {
+				"codetime.statusBarInfo": {
+					"type": "string",
+					"default": "total",
+					"enum": [
+						"total",
+						"today",
+						"average"
+					],
+					"enumDescriptions": [
+						"Show total code time",
+						"Show today code time",
+						"Show average daily code time"
+					],
+					"description": "Select the information showing in the status bar."
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run package",

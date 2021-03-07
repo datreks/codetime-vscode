@@ -10,6 +10,9 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand("codetime.getToken", () => {
     codetime.setToken();
   });
+  vscode.commands.registerCommand("codetime.codeTimeInStatusBar", () => {
+    codetime.codeTimeInStatBar();
+  });
   vscode.commands.registerCommand("codetime.toDashboard", () => {
     let url = `https://codetime.datreks.com/dashboard`;
     vscode.env.openExternal(vscode.Uri.parse(url));
