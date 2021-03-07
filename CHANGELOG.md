@@ -2,9 +2,13 @@
 
 All notable changes to the "CodeTime" extension will be documented in this file.
 
+## [0.0.15] - 2021-03-07
+
+- Feat: Enable to select what time to show in the status bar.
+
 ## [0.0.14] - 2021-02-26
 
-- Feat: Save log to local while the server is temporarily unavailable.
+- Feat: Try to save log to local while the server is temporarily unavailable.
 
 ## [0.0.13] - 2021-02-18
 

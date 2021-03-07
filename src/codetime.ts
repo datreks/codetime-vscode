@@ -15,7 +15,7 @@ export class CodeTime {
     vscode.window
       .showInputBox({
         password: true,
-        placeHolder: "Code Time: Input Your Token (from: codetime.datreks.com)",
+        placeHolder: "CodeTime: Input Your Token (from: codetime.datreks.com)",
       })
       .then((token) => {
         if (token && this.isToken(token)) {
@@ -23,8 +23,8 @@ export class CodeTime {
           this.token = token;
           this.getCurrentDuration(true);
         } else {
-          vscode.window.showErrorMessage("Code Time: Token validation failed");
-          this.statusBar.text = "$(clock) Code Time: Cannot Get Token";
+          vscode.window.showErrorMessage("CodeTime: Token validation failed");
+          this.statusBar.text = "$(clock) CodeTime: Cannot Get Token";
           this.statusBar.tooltip = "Enter Token";
           this.statusBar.command = "codetime.getToken";
           this.token = "";
@@ -78,13 +78,14 @@ export class CodeTime {
   }
 
   private init(): void {
-    this.statusBar.text = "$(clock) Code Time: Initializing...";
+    this.statusBar.text = "$(clock) CodeTime: Initializing...";
     this.statusBar.show();
     this.setupEventListeners();
     this.getCurrentDuration();
     this.inter = setInterval(() => {
       this.getCurrentDuration();
-      this.uploadLocalData();
+      // TODO: Upload Local Data
+      // this.uploadLocalData();
     }, 60 * 1000);
   }
   private setupEventListeners(): void {
@@ -167,15 +168,15 @@ export class CodeTime {
               e.response.statusCode === 400 ||
               e.response.statusCode === 403
             ) {
-              this.statusBar.text = "$(alert) Code Time: Token invalid";
+              this.statusBar.text = "$(alert) CodeTime: Token invalid";
               this.statusBar.tooltip = "Enter Token";
               this.statusBar.command = "codetime.getToken";
             } else {
-              this.statusBar.text =
-                "$(clock) Code Time: Temporarily disconnect";
+              this.statusBar.text = "$(clock) CodeTime: Temporarily disconnect";
               this.statusBar.command = "codetime.toDashboard";
             }
-            this.appendDataToLocal(data);
+            // TODO: Append Data To Local
+            // this.appendDataToLocal(data);
           });
         }
       }
@@ -229,13 +230,13 @@ export class CodeTime {
   private getCurrentDuration(showSuccess = false) {
     const key = vscode.workspace.getConfiguration("codetime").statusBarInfo;
     if (this.token === "") {
-      this.statusBar.text = "$(clock) Code Time: Without Token";
+      this.statusBar.text = "$(clock) CodeTime: Without Token";
       this.statusBar.tooltip = "Enter Token";
       this.statusBar.command = "codetime.getToken";
       return;
     }
     this.statusBar.command = "codetime.toDashboard";
-    this.statusBar.tooltip = "Code Time: Head to the dashboard for statistics";
+    this.statusBar.tooltip = "CodeTime: Head to the dashboard for statistics";
     this.client
       .get(`stats?by=time`)
       .then((res: Response) => {
@@ -259,17 +260,17 @@ export class CodeTime {
         }
         if (showSuccess) {
           vscode.window.showInformationMessage(
-            "Code Time: The Token validation was successful, you can see the code time data in dashboard after writing some code. It may take some time to process the data. Please wait for a while."
+            "CodeTime: The Token validation was successful, you can see the code time data in dashboard after writing some code. It may take some time to process the data. Please wait for a while."
           );
         }
       })
       .catch((e: HTTPError) => {
         if (e.response.statusCode === 400 || e.response.statusCode === 403) {
-          this.statusBar.text = "$(clock) Code Time: Token invalid";
+          this.statusBar.text = "$(clock) CodeTime: Token invalid";
           this.statusBar.tooltip = "Enter Token";
           this.statusBar.command = "codetime.getToken";
         } else {
-          this.statusBar.text = "$(clock) Code Time: Temporarily disconnect";
+          this.statusBar.text = "$(clock) CodeTime: Temporarily disconnect";
           this.statusBar.command = "codetime.toDashboard";
         }
       });

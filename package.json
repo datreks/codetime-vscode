@@ -33,15 +33,15 @@
 		"commands": [
 			{
 				"command": "codetime.getToken",
-				"title": "Code Time: Enter token"
+				"title": "CodeTime: Enter token"
 			},
 			{
 				"command": "codetime.toDashboard",
-				"title": "Code Time: Browse dashboard"
+				"title": "CodeTime: Browse dashboard"
 			},
 			{
 				"command": "codetime.codeTimeInStatusBar",
-				"title": "Code Time: Select status bar info"
+				"title": "CodeTime: Select status bar info"
 			}
 		],
 		"configuration": {
