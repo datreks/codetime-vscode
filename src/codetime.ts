@@ -5,7 +5,12 @@ import * as events from "./events";
 import { getDurationText } from "./getDurationText";
 import { v4 } from "uuid";
 import osName = require("os-name");
+import { appendFile, readFile, unlink } from "fs";
+
+const LOCAL_STORAGE_FILE_NAME = "TempCodetimeData";
+
 export class CodeTime {
+  osName = osName();
   setToken() {
     vscode.window
       .showInputBox({
@@ -16,9 +21,9 @@ export class CodeTime {
         if (token && this.isToken(token)) {
           this.state.update("token", token);
           this.token = token;
-          this.getCurrentDuration();
+          this.getCurrentDuration(true);
         } else {
-          vscode.window.showErrorMessage("Token validation failed");
+          vscode.window.showErrorMessage("Code Time: Token validation failed");
           this.statusBar.text = "$(clock) Code Time: Cannot Get Token";
           this.statusBar.tooltip = "Enter Token";
           this.statusBar.command = "codetime.getToken";
@@ -37,7 +42,6 @@ export class CodeTime {
   inter!: NodeJS.Timeout;
   session: string;
   constructor(state: vscode.Memento) {
-    console.log(state);
     this.state = state;
     this.userId = this.getUserId();
     this.initSetToken();
@@ -80,6 +84,7 @@ export class CodeTime {
     this.getCurrentDuration();
     this.inter = setInterval(() => {
       this.getCurrentDuration();
+      this.uploadLocalData();
     }, 60 * 1000);
   }
   private setupEventListeners(): void {
@@ -146,15 +151,16 @@ export class CodeTime {
             relativeFile: relativeFilePath,
             absoluteFile: absoluteFilePath,
             editor: "VSCode",
-            platform: osName(),
+            platform: this.osName,
             eventTime: time,
             eventType: eventName,
             sessionID: this.session,
             platformVersion: os.release(),
             platformArch: os.arch(),
             editorVersion: vscode.version,
+            pluginVersion: "0.0.12",
+            plugin: "VSCode",
           };
-          console.log(data);
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((e: HTTPError) => {
             if (
@@ -169,13 +175,58 @@ export class CodeTime {
                 "$(clock) Code Time: Temporarily disconnect";
               this.statusBar.command = "codetime.toDashboard";
             }
+            this.appendDataToLocal(data);
           });
         }
       }
     }
   }
 
-  private getCurrentDuration() {
+  private appendDataToLocal(data: {
+    project: string | undefined;
+    language: string;
+    relativeFile: string;
+    absoluteFile: string;
+    editor: string;
+    platform: string;
+    eventTime: number;
+    eventType: string;
+    sessionID: string;
+    platformVersion: string;
+    platformArch: string;
+    editorVersion: string;
+    pluginVersion: string;
+    plugin: string;
+  }) {
+    appendFile(LOCAL_STORAGE_FILE_NAME, JSON.stringify(data) + "\n", () => {});
+  }
+
+  private uploadLocalData() {
+    readFile(LOCAL_STORAGE_FILE_NAME, (_, data) => {
+      const dataList = data
+        .toString()
+        .split("\n")
+        .map((row) => this.tryParseJSON(row))
+        .filter((d) => d);
+      if (dataList.length > 0) {
+        this.client.post(`batchEventLog`, { json: dataList }).then(() => {
+          unlink(LOCAL_STORAGE_FILE_NAME, () => {
+            console.log(`sent batch event log: ${dataList.length} rows`);
+          });
+        });
+      }
+    });
+  }
+  private tryParseJSON(str: string) {
+    try {
+      const o = JSON.parse(str);
+      if (o && typeof o === "object") {
+        return o;
+      }
+    } catch (e) {}
+    return null;
+  }
+  private getCurrentDuration(showSuccess = false) {
     const key = vscode.workspace.getConfiguration("codetime").statusBarInfo;
     if (this.token === "") {
       this.statusBar.text = "$(clock) Code Time: Without Token";
@@ -206,9 +257,11 @@ export class CodeTime {
             this.statusBar.text = `$(watch) ${getDurationText(sumDuration)}`;
             break;
         }
-        // if (cEditorDuration !== sumDuration) {
-        //   txt += `(${getDurationText(cEditorDuration)})`;
-        // }
+        if (showSuccess) {
+          vscode.window.showInformationMessage(
+            "Code Time: The Token validation was successful, you can see the code time data in dashboard after writing some code. It may take some time to process the data. Please wait for a while."
+          );
+        }
       })
       .catch((e: HTTPError) => {
         if (e.response.statusCode === 400 || e.response.statusCode === 403) {
