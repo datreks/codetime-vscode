@@ -23,6 +23,8 @@ Web Site: [Code Time](https://codetime.datreks.com)
 3. In VSCode, Press <kbd>F1</kbd>, enter `token` to find the command: `CodeTime: Enter Token`, Press <kbd>Enter</kbd> and then input your token.
 4. Write some code, visit the dashboard and check if data is available.
 
+> If using an online IDE like [GitHub Codespaces](https://docs.github.com/en/codespaces), add your token to global ENV variable `CODETIME_TOKEN`.
+
 ## Settings
 
 ### Status Bar Info
