@@ -70,8 +70,9 @@ export class CodeTime {
   }
 
   initSetToken() {
-    let token: string | undefined = this.state.get("token");
-    this.token = token ? token : "";
+    const stateToken = this.state.get<string>('token');
+    const envToken = process.env.CODETIME_TOKEN;
+    this.token = envToken ? envToken : stateToken ? stateToken : "";
     if (this.token === "") {
       this.setToken();
     }
