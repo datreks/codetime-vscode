@@ -1,10 +1,10 @@
-import got, { Got, HTTPError, Response } from "got/dist/source";
+import got, { Got, HTTPError, Response } from "got";
 import * as vscode from "vscode";
 import * as os from "os";
 import * as events from "./events";
 import { getDurationText } from "./getDurationText";
 import { v4 } from "uuid";
-import osName = require("os-name");
+import osName from "os-name";
 import { appendFile, readFile, unlink } from "fs";
 
 const LOCAL_STORAGE_FILE_NAME = "TempCodetimeData";

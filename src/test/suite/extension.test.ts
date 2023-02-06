@@ -14,6 +14,6 @@ suite("Extension Test Suite", () => {
     assert.strictEqual(-1, [1, 2, 3].indexOf(0));
   });
   test("write file", () => {
-    appendFile("tempCodetimeData", { test: "test" }, (err) => {});
+    appendFile("tempCodetimeData", "", (err) => {});
   });
 });
