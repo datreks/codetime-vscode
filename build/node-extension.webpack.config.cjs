@@ -19,6 +19,7 @@ const config = {
   },
   devtool: "source-map",
   externals: {
+    sqlite3: 'commonjs sqlite3',
     vscode: "commonjs vscode", // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
   },
   resolve: {
@@ -42,6 +43,7 @@ const config = {
     warningsFilter: [
       /Critical dependency: the request of a dependency is an expression/i,
     ],
+    errorDetails: true,
   },
 };
 module.exports = config;

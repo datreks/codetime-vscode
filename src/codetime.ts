@@ -6,11 +6,13 @@ import { getDurationText } from "./getDurationText";
 import { v4 } from "uuid";
 import osName from "os-name";
 import { appendFile, readFile, unlink } from "fs";
+import { Database } from "sqlite3";
 
 const LOCAL_STORAGE_FILE_NAME = "TempCodetimeData";
 
 export class CodeTime {
   osName = osName();
+  db: Database;
   setToken() {
     vscode.window
       .showInputBox({
@@ -41,12 +43,14 @@ export class CodeTime {
   token: string = "";
   inter!: NodeJS.Timeout;
   session: string;
-  constructor(state: vscode.Memento) {
+  constructor (state: vscode.Memento, db: Database) {
+    // ExtensionContext.globalStorageUri
     this.state = state;
+    this.db = db;
     this.userId = this.getUserId();
     this.initSetToken();
     this.client = got.extend({
-      prefixUrl: "https://codetime-api.datreks.com",
+      prefixUrl: vscode.workspace.getConfiguration("codetime").serverEntrypoint,
       responseType: "json",
       hooks: {
         beforeRequest: [
@@ -160,9 +164,10 @@ export class CodeTime {
             platformVersion: os.release(),
             platformArch: os.arch(),
             editorVersion: vscode.version,
-            pluginVersion: "0.0.12",
+            pluginVersion: "0.0.16",
             plugin: "VSCode",
           };
+          console.log(data);
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((e: HTTPError) => {
             if (
@@ -184,50 +189,7 @@ export class CodeTime {
     }
   }
 
-  private appendDataToLocal(data: {
-    project: string | undefined;
-    language: string;
-    relativeFile: string;
-    absoluteFile: string;
-    editor: string;
-    platform: string;
-    eventTime: number;
-    eventType: string;
-    sessionID: string;
-    platformVersion: string;
-    platformArch: string;
-    editorVersion: string;
-    pluginVersion: string;
-    plugin: string;
-  }) {
-    appendFile(LOCAL_STORAGE_FILE_NAME, JSON.stringify(data) + "\n", () => {});
-  }
 
-  private uploadLocalData() {
-    readFile(LOCAL_STORAGE_FILE_NAME, (_, data) => {
-      const dataList = data
-        .toString()
-        .split("\n")
-        .map((row) => this.tryParseJSON(row))
-        .filter((d) => d);
-      if (dataList.length > 0) {
-        this.client.post(`batchEventLog`, { json: dataList }).then(() => {
-          unlink(LOCAL_STORAGE_FILE_NAME, () => {
-            console.log(`sent batch event log: ${dataList.length} rows`);
-          });
-        });
-      }
-    });
-  }
-  private tryParseJSON(str: string) {
-    try {
-      const o = JSON.parse(str);
-      if (o && typeof o === "object") {
-        return o;
-      }
-    } catch (e) {}
-    return null;
-  }
   private getCurrentDuration(showSuccess = false) {
     const key = vscode.workspace.getConfiguration("codetime").statusBarInfo;
     if (this.token === "") {
