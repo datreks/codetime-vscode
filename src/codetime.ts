@@ -5,10 +5,7 @@ import * as events from "./events";
 import { getDurationText } from "./getDurationText";
 import { v4 } from "uuid";
 import osName from "os-name";
-import { appendFile, readFile, unlink } from "fs";
 import { Database } from "sqlite3";
-
-const LOCAL_STORAGE_FILE_NAME = "TempCodetimeData";
 
 export class CodeTime {
   osName = osName();
@@ -134,6 +131,8 @@ export class CodeTime {
   private onSave(e: vscode.TextDocument) {
     this.onChange(events.FILE_SAVED);
   }
+  platfromVersion = os.release();
+  platfromArch = os.arch();
   private onChange(eventName = "unknown") {
     let editor = vscode.window.activeTextEditor;
     let workspaceName = vscode.workspace.name;
@@ -161,8 +160,8 @@ export class CodeTime {
             eventTime: time,
             eventType: eventName,
             sessionID: this.session,
-            platformVersion: os.release(),
-            platformArch: os.arch(),
+            platformVersion: this.platfromVersion,
+            platformArch: this.platfromArch,
             editorVersion: vscode.version,
             pluginVersion: "0.0.16",
             plugin: "VSCode",
@@ -200,10 +199,14 @@ export class CodeTime {
     }
     this.statusBar.command = "codetime.toDashboard";
     this.statusBar.tooltip = "CodeTime: Head to the dashboard for statistics";
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     this.client
-      .get(`stats?by=time`)
+      .get(`stats?by=time&tz=${tz}`)
       .then((res: Response) => {
         let data = res.body as any;
+        data.data = data.data.sort((a: any, b: any) => { 
+          return new Date(a.time).getTime() - new Date(b.time).getTime();
+        });
         const sumDuration = data.data.reduce((acc: any, cur: any) => {
           return acc + cur.duration;
         }, 0);

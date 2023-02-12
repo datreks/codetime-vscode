@@ -3,15 +3,14 @@
 	"displayName": "CodeTime",
 	"description": "Codetime vscode plugin. Statistical analysis of code time.",
 	"publisher": "Jannchie",
-	"version": "0.0.16",
+	"version": "0.0.17",
 	"homepage": "https://github.com/Data-Trekkers/codetime-vscode#readme",
-	"type": "module",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Data-Trekkers/codetime-vscode"
 	},
 	"engines": {
-		"vscode": "^1.51.0"
+		"vscode": "^1.75.0"
 	},
 	"categories": [
 		"Other"
@@ -29,7 +28,7 @@
 	"activationEvents": [
 		"*"
 	],
-	"main": "./dist/extension.cjs",
+	"main": "./dist/extension.js",
 	"contributes": {
 		"commands": [
 			{
@@ -73,9 +72,11 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "pnpm run package",
-		"compile": "webpack --devtool nosources-source-map --config ./build/node-extension.webpack.config.cjs",
-		"watch": "webpack --watch --devtool nosources-source-map --config ./build/node-extension.webpack.config.cjs --stats-error-details",
-		"package": "webpack --mode production --config ./build/node-extension.webpack.config.cjs ",
+		"vscode:package": "vsce package",
+		"vscode:publish": "vsce publish",
+		"compile": "webpack --devtool nosources-source-map --config ./build/node-extension.webpack.config.js",
+		"watch": "webpack --watch --devtool nosources-source-map --config ./build/node-extension.webpack.config.js --stats-error-details",
+		"package": "webpack --mode production --config ./build/node-extension.webpack.config.js ",
 		"test-compile": "tsc -p ./",
 		"test-watch": "tsc -watch -p ./",
 		"pretest": "pnpm run test-compile && yarn run lint",
@@ -87,8 +88,8 @@
 		"@types/mocha": "^10.0.1",
 		"@types/node": "^18.11.19",
 		"@types/vscode": "^1.75.0",
-		"@typescript-eslint/eslint-plugin": "^5.50.0",
-		"@typescript-eslint/parser": "^5.50.0",
+		"@typescript-eslint/eslint-plugin": "^5.51.0",
+		"@typescript-eslint/parser": "^5.51.0",
 		"eslint": "^8.33.0",
 		"glob": "^8.1.0",
 		"mocha": "^10.2.0",

@@ -13,7 +13,7 @@ const config = {
   output: {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
     path: path.resolve(__dirname, "..", "dist"),
-    filename: "extension.cjs",
+    filename: "extension.js",
     libraryTarget: "commonjs2",
     devtoolModuleFilenameTemplate: "../[resource-path]",
   },
@@ -40,10 +40,10 @@ const config = {
     ],
   },
   stats: {
-    warningsFilter: [
-      /Critical dependency: the request of a dependency is an expression/i,
-    ],
     errorDetails: true,
   },
+  ignoreWarnings: [
+    /Critical dependency: the request of a dependency is an expression/i,
+  ],
 };
 module.exports = config;
