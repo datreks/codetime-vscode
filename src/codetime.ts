@@ -5,11 +5,9 @@ import * as events from "./events";
 import { getDurationText } from "./getDurationText";
 import { v4 } from "uuid";
 import osName from "os-name";
-import { Database } from "sqlite3";
 
 export class CodeTime {
   osName = osName();
-  db: Database;
   setToken() {
     vscode.window
       .showInputBox({
@@ -40,10 +38,9 @@ export class CodeTime {
   token: string = "";
   inter!: NodeJS.Timeout;
   session: string;
-  constructor (state: vscode.Memento, db: Database) {
+  constructor (state: vscode.Memento) {
     // ExtensionContext.globalStorageUri
     this.state = state;
-    this.db = db;
     this.userId = this.getUserId();
     this.initSetToken();
     this.client = got.extend({
