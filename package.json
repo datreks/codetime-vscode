@@ -64,7 +64,7 @@
 				},
 				"codetime.serverEntrypoint": {
 					"type": "string",
-					"default": "https://codetime-api.datreks.com",
+					"default": "https://api.codetime.dev",
 					"description": "Server entrypoint defines the URL for reporting data to a server."
 				}
 			}
