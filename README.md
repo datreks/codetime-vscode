@@ -17,7 +17,7 @@ Web Site: [Code Time](https://codetime.dev)
 ## Usage
 
 1. Login from web site: [CodeTime](https://codetime.dev).
-2. Get token from web site: [CodeTime / settings](https://codetime.dev/settings).
+2. Get token from web site: [CodeTime / settings](https://codetime.dev/dashboard/settings).
 3. In VSCode, Press <kbd>F1</kbd>, enter `token` to find the command: `CodeTime: Enter Token`, Press <kbd>Enter</kbd> and then input your token.
 4. Write some code, visit the dashboard and check if data is available.
 
