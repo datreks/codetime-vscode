@@ -173,10 +173,14 @@ export class CodeTime {
               this.statusBar.text = "$(alert) CodeTime: Token invalid";
               this.statusBar.tooltip = "Enter Token";
               this.statusBar.command = "codetime.getToken";
+            } else if (e.response.statusCode === 401) { 
+              this.statusBar.text = "$(alert) CodeTime: Token invalid";
+              this.statusBar.tooltip = "Enter Token";
+              this.statusBar.command = "codetime.getToken"; 
             } else {
               this.statusBar.text = "$(clock) CodeTime: Temporarily disconnect";
               this.statusBar.command = "codetime.toDashboard";
-            }
+            } 
             // TODO: Append Data To Local
             // this.appendDataToLocal(data);
           });
