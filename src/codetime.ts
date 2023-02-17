@@ -12,7 +12,7 @@ export class CodeTime {
     vscode.window
       .showInputBox({
         password: true,
-        placeHolder: "CodeTime: Input Your Token (from: codetime.datreks.com)",
+        placeHolder: "CodeTime: Input Your Token (from: codetime.dev)",
       })
       .then((token) => {
         if (token && this.isToken(token)) {
