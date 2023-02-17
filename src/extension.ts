@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
     codetime.codeTimeInStatBar();
   });
   vscode.commands.registerCommand("codetime.toDashboard", () => {
-    let url = `https://codetime.datreks.com/dashboard`;
+    let url = `https://codetime.dev/dashboard`;
     vscode.env.openExternal(vscode.Uri.parse(url));
   });
 }
