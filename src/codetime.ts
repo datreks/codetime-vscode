@@ -151,19 +151,13 @@ export class CodeTime {
             project: workspaceName,
             language: lang,
             relativeFile: relativeFilePath,
-            absoluteFile: absoluteFilePath,
             editor: "VSCode",
             platform: this.osName,
             eventTime: time,
             eventType: eventName,
-            sessionID: this.session,
-            platformVersion: this.platfromVersion,
             platformArch: this.platfromArch,
-            editorVersion: vscode.version,
-            pluginVersion: "0.0.16",
             plugin: "VSCode",
           };
-          console.log(data);
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((e: HTTPError) => {
             if (
@@ -232,6 +226,9 @@ export class CodeTime {
         }
       })
       .catch((e: HTTPError) => {
+        vscode.window.showErrorMessage(
+          `CodeTime: The Token validation failed(${e.response.statusCode}), please check your token. ${e.response.body}`
+        );
         if (e.response.statusCode === 400 || e.response.statusCode === 403) {
           this.statusBar.text = "$(clock) CodeTime: Token invalid";
           this.statusBar.tooltip = "Enter Token";
