@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import got, { Got, HTTPError, Response } from "got";
 import * as vscode from "vscode";
 import * as os from "os";
@@ -46,6 +47,9 @@ export class CodeTime {
     this.client = got.extend({
       prefixUrl: vscode.workspace.getConfiguration("codetime").serverEntrypoint,
       responseType: "json",
+      headers: {
+        "User-Agent": "CodeTime Client",
+      },
       hooks: {
         beforeRequest: [
           async (options) => {
