@@ -155,6 +155,7 @@ export class CodeTime {
             project: workspaceName,
             language: lang,
             relativeFile: relativeFilePath,
+            absoluteFile: absoluteFilePath,
             editor: "VSCode",
             platform: this.osName,
             eventTime: time,
