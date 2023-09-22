@@ -231,9 +231,9 @@ export class CodeTime {
         }
       })
       .catch((e: HTTPError) => {
-        vscode.window.showErrorMessage(
-          `CodeTime: The Token validation failed(${e.response.statusCode}), please check your token. ${e.response.body}`
-        );
+        // vscode.window.showErrorMessage(
+        //   `CodeTime: The Token validation failed(${e.response.statusCode}), please check your token. ${e.response.body}`
+        // );
         if (e.response.statusCode === 400 || e.response.statusCode === 403) {
           this.statusBar.text = "$(clock) CodeTime: Token invalid";
           this.statusBar.tooltip = "Enter Token";
