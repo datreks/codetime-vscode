@@ -53,12 +53,12 @@
           "enum": [
             "total",
             "today",
-            "average"
+            "24h"
           ],
           "enumDescriptions": [
             "Show total code time",
             "Show today code time",
-            "Show average daily code time"
+            "Show 24h code time"
           ],
           "description": "Select the information showing in the status bar."
         },

@@ -1,7 +1,8 @@
 import * as os from 'node:os'
 import process from 'node:process'
-import type { Got } from 'got'
 import { got } from 'got'
+import type { Got, Response } from 'got'
+
 import * as vscode from 'vscode'
 import { v4 } from 'uuid'
 import osName from 'os-name'
@@ -213,64 +214,48 @@ export class CodeTime {
     }
     this.statusBar.command = 'codetime.toDashboard'
     this.statusBar.tooltip = 'CodeTime: Head to the dashboard for statistics'
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-    this.client
-      .get(`stats?by=time&tz=${tz}`)
-      .then((res) => {
-        const data = res.body as any
-        data.data = data.data.sort((a: any, b: any) => {
-          return new Date(a.time).getTime() - new Date(b.time).getTime()
-        })
-        const sumDuration = data.data.reduce((acc: any, cur: any) => {
-          return acc + cur.duration
-        }, 0)
-        const avgDuration: number = sumDuration / data.data.length
-        switch (key) {
-          case 'average':
-            this.statusBar.text = `$(watch) ${getDurationText(avgDuration)}`
-            break
-          case 'today':
-            this.statusBar.text = `$(watch) ${getDurationText(
-              data.data[data.data.length - 1].duration,
-            )}`
-            break
-          default:
-            this.statusBar.text = `$(watch) ${getDurationText(sumDuration)}`
-            break
-        }
-        if (showSuccess) {
-          vscode.window.showInformationMessage(
-            'CodeTime: The Token validation was successful, you can see the code time data in dashboard after writing some code. It may take some time to process the data. Please wait for a while.',
-          )
-        }
-      })
-      .catch((e: { response: { statusCode: number } }) => {
-        // vscode.window.showErrorMessage(
-        //   `CodeTime: The Token validation failed(${e.response.statusCode}), please check your token. ${e.response.body}`
-        // );
-        if (e.response.statusCode === 400 || e.response.statusCode === 403) {
-          this.statusBar.text = '$(clock) CodeTime: Token invalid'
-          this.statusBar.tooltip = 'Enter Token'
-          this.statusBar.command = 'codetime.getToken'
-        }
-        else {
-          this.statusBar.text = '$(clock) CodeTime: Temporarily disconnect'
-          this.statusBar.command = 'codetime.toDashboard'
-        }
-      })
+    let minutes = 60 * 24
+    switch (key) {
+      case 'today': {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+        const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }))
+        const hours = now.getHours()
+        minutes = now.getMinutes()
+        minutes += hours * 60
+        break
+      }
+      case 'total' : {
+        minutes = 60 * 24 * 365 * 100
+        break
+      }
+      case '24h': {
+        minutes = 60 * 24
+        break
+      }
+      default: {
+        minutes = 60 * 24 * 365 * 100
+        break
+      }
+    }
+    this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then((res) => {
+      const minutes = res.body.minutes
+      this.statusBar.text = `$(watch) ${getDurationText(minutes * 60 * 1000)}`
+      if (showSuccess)
+        vscode.window.showInformationMessage('CodeTime: Token validation succeeded')
+    })
   }
 
   public codeTimeInStatBar() {
     vscode.window
       .showQuickPick(
-        ['Total code time', 'Average daily code time', 'Today code time'],
+        ['Total code time', '24h code time', 'Today code time'],
         {},
       )
       .then((v) => {
         let key = 'total'
         switch (v) {
-          case 'Average daily code time':
-            key = 'average'
+          case '24h code time':
+            key = '24h'
             break
           case 'Today code time':
             key = 'today'
