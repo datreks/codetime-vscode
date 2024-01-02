@@ -1,20 +1,14 @@
 {
+  "publisher": "Jannchie",
   "name": "codetime",
   "displayName": "CodeTime",
-  "description": "Codetime vscode plugin. Statistical analysis of code time.",
-  "publisher": "Jannchie",
   "version": "0.5.1",
+  "description": "Codetime vscode plugin. Statistical analysis of code time.",
   "homepage": "https://github.com/Data-Trekkers/codetime-vscode#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/Data-Trekkers/codetime-vscode"
   },
-  "engines": {
-    "vscode": "^1.75.0"
-  },
-  "categories": [
-    "Other"
-  ],
   "keywords": [
     "code time",
     "code",
@@ -24,11 +18,17 @@
     "codetime",
     "worktime"
   ],
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.js",
   "icon": "images/logo.png",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
@@ -73,7 +73,7 @@
   "scripts": {
     "vscode:prepublish": "pnpm run package",
     "vscode:package": "vsce package",
-    "vscode:publish": "vsce publish",
+    "vscode:publish": "vsce package && vsce publish",
     "compile": "webpack --devtool nosources-source-map --config ./build/node-extension.webpack.config.js",
     "watch": "webpack --watch --devtool nosources-source-map --config ./build/node-extension.webpack.config.js --stats-error-details",
     "package": "webpack --mode production --config ./build/node-extension.webpack.config.js ",
@@ -83,21 +83,6 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
-  "devDependencies": {
-    "@types/glob": "^8.0.1",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.19",
-    "@types/vscode": "^1.75.0",
-    "@typescript-eslint/eslint-plugin": "^5.51.0",
-    "@typescript-eslint/parser": "^5.51.0",
-    "eslint": "^8.33.0",
-    "glob": "^8.1.0",
-    "mocha": "^10.2.0",
-    "ts-loader": "^9.4.2",
-    "typescript": "^4.9.5",
-    "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.1"
-  },
   "dependencies": {
     "@npmcli/fs": "^3.1.0",
     "@types/uuid": "^9.0.0",
@@ -105,5 +90,19 @@
     "got": "^12.5.3",
     "os-name": "^5.1.0",
     "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@jannchie/eslint-config": "^3.0.0",
+    "@types/glob": "^8.0.1",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.11.19",
+    "@types/vscode": "^1.75.0",
+    "eslint": "^8.56.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.5",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   }
 }

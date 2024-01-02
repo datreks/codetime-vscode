@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
     "target": "es6",
-    "outDir": "out",
     "lib": [
       "es6",
       "DOM"
     ],
-    "sourceMap": true,
     "rootDir": "src",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "strict": true, /* enable all strict type-checking options */
-    "esModuleInterop": true,
+    "strict": true,
+    "outDir": "out",
+    "sourceMap": true, /* enable all strict type-checking options */
+    "esModuleInterop": true
     /* Additional Checks */
     // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
     // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
