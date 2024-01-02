@@ -2,6 +2,12 @@
 
 All notable changes to the "CodeTime" extension will be documented in this file.
 
+## v0.6.0
+
+### 🚀 Enhancements
+
+- Record Git Origin URL
+
 ## v0.4.1
 
 [compare changes](https://github.com/Data-Trekkers/codetime-vscode/compare/v0.0.13...v0.4.1)
