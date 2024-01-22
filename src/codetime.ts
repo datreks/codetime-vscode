@@ -1,7 +1,7 @@
 import * as os from 'node:os'
 import process from 'node:process'
 import { got } from 'got'
-import type { Got, Response } from 'got'
+import type { Got } from 'got'
 
 import * as vscode from 'vscode'
 import { v4 } from 'uuid'
@@ -115,17 +115,12 @@ export class CodeTime {
 
   private onEdit(e: vscode.TextDocumentChangeEvent) {
     let eventName = events.FILE_EDITED
-    if (
-      e.contentChanges.length === 1
-      && /\r\n|\n|\r/.test(e.contentChanges[0].text)
-    ) {
+    if (e.contentChanges.length === 1
+      && /\r\n|\n|\r/.test(e.contentChanges[0].text)) {
       eventName = events.FILE_ADDED_LINE
       this.onChange(eventName)
     }
-    else {
-      if (Math.random() > 0.9)
-        this.onChange(eventName)
-    }
+    else if (Math.random() > 0.9) { this.onChange(eventName) }
   }
 
   private onEditor(_e: vscode.TextEditor | undefined) {
@@ -179,23 +174,25 @@ export class CodeTime {
           }
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((e: { response: { statusCode: number } }) => {
-            if (
-              e.response.statusCode === 400
-              || e.response.statusCode === 403
-            ) {
-              this.statusBar.text = '$(alert) CodeTime: Token invalid'
-              this.statusBar.tooltip = 'Enter Token'
-              this.statusBar.command = 'codetime.getToken'
-            }
-            else if (e.response.statusCode === 401) {
-              this.statusBar.text = '$(alert) CodeTime: Token invalid'
-              this.statusBar.tooltip = 'Enter Token'
-              this.statusBar.command = 'codetime.getToken'
-            }
-            else {
-              this.statusBar.text = '$(clock) CodeTime: Temporarily disconnect'
-              this.statusBar.command = 'codetime.toDashboard'
-            }
+            // if (
+            //   e.response.statusCode === 400
+            //   || e.response.statusCode === 403
+            // ) {
+            //   this.statusBar.text = '$(alert) CodeTime: Token invalid'
+            //   this.statusBar.tooltip = 'Enter Token'
+            //   this.statusBar.command = 'codetime.getToken'
+            // }
+            // else if (e.response.statusCode === 401) {
+            //   this.statusBar.text = '$(alert) CodeTime: Token invalid'
+            //   this.statusBar.tooltip = 'Enter Token'
+            //   this.statusBar.command = 'codetime.getToken'
+            // }
+            // else {
+            //   this.statusBar.text = '$(clock) CodeTime: Temporarily disconnect'
+            //   this.statusBar.command = 'codetime.toDashboard'
+            // }
+            // eslint-disable-next-line no-console
+            console.info(e)
             // TODO: Append Data To Local
             // this.appendDataToLocal(data);
           })
@@ -238,7 +235,7 @@ export class CodeTime {
       }
     }
     this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then((res) => {
-      const minutes = res.body.minutes
+      const { minutes } = res.body
       this.statusBar.text = `$(watch) ${getDurationText(minutes * 60 * 1000)}`
       if (showSuccess)
         vscode.window.showInformationMessage('CodeTime: Token validation succeeded')
