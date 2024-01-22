@@ -2,7 +2,7 @@
   "publisher": "Jannchie",
   "name": "codetime",
   "displayName": "CodeTime",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Codetime vscode plugin. Statistical analysis of code time.",
   "homepage": "https://github.com/Data-Trekkers/codetime-vscode#readme",
   "repository": {
