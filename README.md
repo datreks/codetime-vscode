@@ -10,9 +10,7 @@ Web Site: [Code Time](https://codetime.dev)
 
 ## Previews
 
-![Dash board](images/preview-1.png)
-
-![Badge](images/preview-2.png)
+![Dash board](images/preview.png)
 
 ## Usage
 
