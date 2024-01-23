@@ -21,3 +21,22 @@ export function getGitOriginUrl() {
     return ''
   }
 }
+
+export function getGitCurrentBranch() {
+  try {
+    const folder = vscode.workspace.workspaceFolders?.[0] ?? null
+    if (!folder)
+      return ''
+
+    const gitBranch = execSync('git rev-parse --abbrev-ref HEAD', {
+      cwd: folder.uri.fsPath,
+    }).toString().trim()
+    if (gitBranch.includes('fatal:'))
+      return ''
+    return gitBranch
+  }
+  catch (e) {
+    console.error('getCurrentBranch error', e)
+    return ''
+  }
+}

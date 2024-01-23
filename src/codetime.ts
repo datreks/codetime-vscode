@@ -8,7 +8,7 @@ import { v4 } from 'uuid'
 import osName from 'os-name'
 import * as events from './events'
 import { getDurationText } from './getDurationText'
-import { getGitOriginUrl } from './utils'
+import { getGitCurrentBranch, getGitOriginUrl } from './utils'
 
 export class CodeTime {
   osName = osName()
@@ -159,6 +159,7 @@ export class CodeTime {
         if (relativeFilePath) {
           const time: number = Date.now()
           const origin = getGitOriginUrl()
+          const branch = getGitCurrentBranch()
           const data = {
             project: workspaceName,
             language: lang,
@@ -171,6 +172,7 @@ export class CodeTime {
             platformArch: this.platfromArch,
             plugin: 'VSCode',
             gitOrigin: origin,
+            gitBranch: branch,
           }
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((e: { response: { statusCode: number } }) => {
