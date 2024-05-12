@@ -12,6 +12,16 @@ import { getGitCurrentBranch, getGitOriginUrl } from './utils'
 
 export class CodeTime {
   osName = osName()
+  out: vscode.OutputChannel = vscode.window.createOutputChannel('Codetime')
+  private debounceTimer?: NodeJS.Timeout
+
+  private debounce(func: any, wait: number) {
+    return (...args: any) => {
+      clearTimeout(this.debounceTimer)
+      this.debounceTimer = setTimeout(() => func.apply(this, args), wait)
+    }
+  }
+
   setToken() {
     vscode.window
       .showInputBox({
@@ -101,10 +111,12 @@ export class CodeTime {
   private setupEventListeners(): void {
     // subscribe to selection change and editor activation events
     const events: vscode.Disposable[] = []
+    vscode.workspace.onDidChangeTextDocument(this.onEdit, this, events)
     vscode.window.onDidChangeActiveTextEditor(this.onEditor, this, events)
+    vscode.window.onDidChangeTextEditorSelection(this.onChangeTextEditorSelection, this, events)
+    vscode.window.onDidChangeTextEditorVisibleRanges(this.onChangeTextEditorVisibleRanges, this, events)
     vscode.window.onDidChangeWindowState(this.onFocus, this, events)
     vscode.workspace.onDidSaveTextDocument(this.onSave, this, events)
-    vscode.workspace.onDidChangeTextDocument(this.onEdit, this, events)
     vscode.workspace.onDidCreateFiles(this.onCreate, this, events)
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('codetime'))
@@ -115,17 +127,38 @@ export class CodeTime {
 
   private onEdit(e: vscode.TextDocumentChangeEvent) {
     let eventName = events.FILE_EDITED
+    // 如果 document 是 output channel 的话，不记录
+    if (e.document.uri.scheme === 'output')
+      return
+
     if (e.contentChanges.length === 1
       && /\r\n|\n|\r/.test(e.contentChanges[0].text)) {
       eventName = events.FILE_ADDED_LINE
       this.onChange(eventName)
     }
-    else if (Math.random() > 0.9) { this.onChange(eventName) }
+    else if (Math.random() > 0.9) {
+      this.onChange(eventName)
+    }
   }
 
   private onEditor(_e: vscode.TextEditor | undefined) {
     this.onChange(events.ACTIVATE_FILE_CHANGED)
   }
+
+  private onChangeTextEditorSelection(e: vscode.TextEditorSelectionChangeEvent) {
+    if (e.textEditor.document.uri.scheme === 'output')
+      return
+
+    if (Math.random() > 0.9)
+      this.onChange(events.CHANGE_EDITOR_SELECTION)
+  }
+
+  private onChangeTextEditorVisibleRanges = this.debounce((_e: vscode.TextEditorVisibleRangesChangeEvent) => {
+    if (_e.textEditor.document.uri.scheme === 'output')
+      return
+
+    this.onChange(events.CHANGE_EDITOR_VISIBLE_RANGES)
+  }, 300) // 300毫秒的节流时间
 
   private onFocus(_e: vscode.WindowState) {
     this.onChange(events.EDITOR_CHANGED)
@@ -141,6 +174,20 @@ export class CodeTime {
 
   platfromVersion = os.release()
   platfromArch = os.arch()
+
+  private getOperationType(eventName = 'unknown'): 'read' | 'write' {
+    switch (eventName) {
+      case events.FILE_CREATED:
+      case events.FILE_EDITED:
+      case events.FILE_ADDED_LINE:
+      case events.FILE_REMOVED:
+      case events.FILE_SAVED:
+        return 'write'
+      default:
+        return 'read'
+    }
+  }
+
   private onChange(eventName = 'unknown') {
     const editor = vscode.window.activeTextEditor
     const workspaceName = vscode.workspace.name
@@ -173,30 +220,13 @@ export class CodeTime {
             plugin: 'VSCode',
             gitOrigin: origin,
             gitBranch: branch,
+            operationType: this.getOperationType(eventName),
           }
+          this.out.appendLine(JSON.stringify(data))
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((e: { response: { statusCode: number } }) => {
-            // if (
-            //   e.response.statusCode === 400
-            //   || e.response.statusCode === 403
-            // ) {
-            //   this.statusBar.text = '$(alert) CodeTime: Token invalid'
-            //   this.statusBar.tooltip = 'Enter Token'
-            //   this.statusBar.command = 'codetime.getToken'
-            // }
-            // else if (e.response.statusCode === 401) {
-            //   this.statusBar.text = '$(alert) CodeTime: Token invalid'
-            //   this.statusBar.tooltip = 'Enter Token'
-            //   this.statusBar.command = 'codetime.getToken'
-            // }
-            // else {
-            //   this.statusBar.text = '$(clock) CodeTime: Temporarily disconnect'
-            //   this.statusBar.command = 'codetime.toDashboard'
-            // }
-            // eslint-disable-next-line no-console
-            console.info(e)
+            this.out.appendLine(`Error: ${e}`)
             // TODO: Append Data To Local
-            // this.appendDataToLocal(data);
           })
         }
       }
@@ -236,7 +266,7 @@ export class CodeTime {
         break
       }
     }
-    this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then((res) => {
+    this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then((res: { body: { minutes: any } }) => {
       const { minutes } = res.body
       this.statusBar.text = `$(watch) ${getDurationText(minutes * 60 * 1000)}`
       if (showSuccess)

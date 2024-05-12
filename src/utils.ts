@@ -33,6 +33,7 @@ export function getGitCurrentBranch() {
     }).toString().trim()
     if (gitBranch.includes('fatal:'))
       return ''
+
     return gitBranch
   }
   catch (e) {
