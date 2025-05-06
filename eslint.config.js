@@ -1,3 +1,3 @@
-const antfu = require('@antfu/eslint-config').default
+const jannchie = require('@jannchie/eslint-config').default
 
-module.exports = antfu()
+module.exports = jannchie()
