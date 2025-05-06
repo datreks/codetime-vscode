@@ -243,29 +243,7 @@ export class CodeTime {
     }
     this.statusBar.command = 'codetime.toDashboard'
     this.statusBar.tooltip = 'CodeTime: Head to the dashboard for statistics'
-    let minutes = 60 * 24
-    switch (key) {
-      case 'today': {
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-        const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }))
-        const hours = now.getHours()
-        minutes = now.getMinutes()
-        minutes += hours * 60
-        break
-      }
-      case 'total' : {
-        minutes = 60 * 24 * 365 * 100
-        break
-      }
-      case '24h': {
-        minutes = 60 * 24
-        break
-      }
-      default: {
-        minutes = 60 * 24 * 365 * 100
-        break
-      }
-    }
+    const minutes = getMinutes(key)
     this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then((res: { body: { minutes: any } }) => {
       const { minutes } = res.body
       this.statusBar.text = `$(watch) ${getDurationText(minutes * 60 * 1000)}`
@@ -304,4 +282,31 @@ export class CodeTime {
     this.disposable.dispose()
     clearInterval(this.inter)
   }
+}
+
+function getMinutes(key: string) {
+  let minutes = 60 * 24
+  switch (key) {
+    case 'today': {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+      const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }))
+      const hours = now.getHours()
+      minutes = now.getMinutes()
+      minutes += hours * 60
+      break
+    }
+    case 'total': {
+      minutes = 60 * 24 * 365 * 100
+      break
+    }
+    case '24h': {
+      minutes = 60 * 24
+      break
+    }
+    default: {
+      minutes = 60 * 24 * 365 * 100
+      break
+    }
+  }
+  return minutes
 }
