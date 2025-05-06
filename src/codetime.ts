@@ -116,7 +116,7 @@ export class CodeTime {
     vscode.workspace.onDidChangeTextDocument(this.onEdit, this, events)
     vscode.window.onDidChangeActiveTextEditor(this.onEditor, this, events)
     vscode.window.onDidChangeTextEditorSelection(this.onChangeTextEditorSelection, this, events)
-    vscode.window.onDidChangeTextEditorVisibleRanges(this.onChangeTextEditorVisibleRanges, this, events)
+    vscode.window.onDidChangeTextEditorVisibleRanges(this.debounce(this.onChangeTextEditorVisibleRanges, 300), this, events)
     vscode.window.onDidChangeWindowState(this.onFocus, this, events)
     vscode.workspace.onDidSaveTextDocument(this.onSave, this, events)
     vscode.workspace.onDidCreateFiles(this.onCreate, this, events)
@@ -159,13 +159,13 @@ export class CodeTime {
     }
   }
 
-  private onChangeTextEditorVisibleRanges = this.debounce((_e: vscode.TextEditorVisibleRangesChangeEvent) => {
+  private onChangeTextEditorVisibleRanges(_e: vscode.TextEditorVisibleRangesChangeEvent): void {
     if (_e.textEditor.document.uri.scheme === 'output') {
       return
     }
 
     this.onChange(events.CHANGE_EDITOR_VISIBLE_RANGES)
-  }, 300) // 300毫秒的节流时间
+  }
 
   private onFocus(_e: vscode.WindowState) {
     this.onChange(events.EDITOR_CHANGED)
