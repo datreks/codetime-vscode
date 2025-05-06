@@ -10,7 +10,6 @@ All notable changes to the "CodeTime" extension will be documented in this file.
 
 - **time:** Show correctly total time & today's time ([e259bb7](https://github.com/Data-Trekkers/codetime-vscode/commit/e259bb7))
 
-
 ### ❤️ Contributors
 
 - Jianqi Pan ([@Jannchie](http://github.com/Jannchie))
