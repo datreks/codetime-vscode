@@ -1,11 +1,11 @@
+import type { Got } from 'got'
 import * as os from 'node:os'
 import process from 'node:process'
 import { got } from 'got'
-import type { Got } from 'got'
 
-import * as vscode from 'vscode'
-import { v4 } from 'uuid'
 import osName from 'os-name'
+import { v4 } from 'uuid'
+import * as vscode from 'vscode'
 import * as events from './events'
 import { getDurationText } from './getDurationText'
 import { getGitCurrentBranch, getGitOriginUrl } from './utils'
@@ -68,8 +68,9 @@ export class CodeTime {
       hooks: {
         beforeRequest: [
           (options: any) => {
-            if (options.headers)
+            if (options.headers) {
               options.headers.token = this.token
+            }
           },
         ],
       },
@@ -83,7 +84,7 @@ export class CodeTime {
   }
 
   isToken(token: string) {
-    return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
       token,
     )
   }
@@ -92,8 +93,9 @@ export class CodeTime {
     const stateToken = this.state.get<string>('token')
     const envToken = process.env.CODETIME_TOKEN
     this.token = envToken || (stateToken || '')
-    if (this.token === '')
+    if (this.token === '') {
       this.setToken()
+    }
   }
 
   private init(): void {
@@ -119,8 +121,9 @@ export class CodeTime {
     vscode.workspace.onDidSaveTextDocument(this.onSave, this, events)
     vscode.workspace.onDidCreateFiles(this.onCreate, this, events)
     vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration('codetime'))
+      if (e.affectsConfiguration('codetime')) {
         this.getCurrentDuration()
+      }
     })
     this.disposable = vscode.Disposable.from(...events)
   }
@@ -128,8 +131,9 @@ export class CodeTime {
   private onEdit(e: vscode.TextDocumentChangeEvent) {
     let eventName = events.FILE_EDITED
     // 如果 document 是 output channel 的话，不记录
-    if (e.document.uri.scheme === 'output')
+    if (e.document.uri.scheme === 'output') {
       return
+    }
 
     if (e.contentChanges.length === 1
       && /\r\n|\n|\r/.test(e.contentChanges[0].text)) {
@@ -146,16 +150,19 @@ export class CodeTime {
   }
 
   private onChangeTextEditorSelection(e: vscode.TextEditorSelectionChangeEvent) {
-    if (e.textEditor.document.uri.scheme === 'output')
+    if (e.textEditor.document.uri.scheme === 'output') {
       return
+    }
 
-    if (Math.random() > 0.9)
+    if (Math.random() > 0.9) {
       this.onChange(events.CHANGE_EDITOR_SELECTION)
+    }
   }
 
   private onChangeTextEditorVisibleRanges = this.debounce((_e: vscode.TextEditorVisibleRangesChangeEvent) => {
-    if (_e.textEditor.document.uri.scheme === 'output')
+    if (_e.textEditor.document.uri.scheme === 'output') {
       return
+    }
 
     this.onChange(events.CHANGE_EDITOR_VISIBLE_RANGES)
   }, 300) // 300毫秒的节流时间
@@ -181,10 +188,12 @@ export class CodeTime {
       case events.FILE_EDITED:
       case events.FILE_ADDED_LINE:
       case events.FILE_REMOVED:
-      case events.FILE_SAVED:
+      case events.FILE_SAVED: {
         return 'write'
-      default:
+      }
+      default: {
         return 'read'
+      }
     }
   }
 
@@ -200,8 +209,9 @@ export class CodeTime {
         let relativeFilePath: string = vscode.workspace.asRelativePath(
           absoluteFilePath,
         )
-        if (relativeFilePath === absoluteFilePath)
+        if (relativeFilePath === absoluteFilePath) {
           relativeFilePath = '[other workspace]'
+        }
 
         if (relativeFilePath) {
           const time: number = Date.now()
@@ -224,8 +234,8 @@ export class CodeTime {
           }
           this.out.appendLine(JSON.stringify(data))
           // Post data
-          this.client.post(`eventLog`, { json: data }).catch((e: { response: { statusCode: number } }) => {
-            this.out.appendLine(`Error: ${e}`)
+          this.client.post(`eventLog`, { json: data }).catch((error: { response: { statusCode: number } }) => {
+            this.out.appendLine(`Error: ${error}`)
             // TODO: Append Data To Local
           })
         }
@@ -247,8 +257,9 @@ export class CodeTime {
     this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then((res: { body: { minutes: any } }) => {
       const { minutes } = res.body
       this.statusBar.text = `$(watch) ${getDurationText(minutes * 60 * 1000)}`
-      if (showSuccess)
+      if (showSuccess) {
         vscode.window.showInformationMessage('CodeTime: Token validation succeeded')
+      }
     })
   }
 
@@ -261,14 +272,17 @@ export class CodeTime {
       .then((v) => {
         let key = 'total'
         switch (v) {
-          case '24h code time':
+          case '24h code time': {
             key = '24h'
             break
-          case 'Today code time':
+          }
+          case 'Today code time': {
             key = 'today'
             break
-          default:
+          }
+          default: {
             break
+          }
         }
         vscode.workspace
           .getConfiguration('codetime')

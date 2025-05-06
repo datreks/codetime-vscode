@@ -20,6 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-  if (codetime)
+  if (codetime) {
     codetime.dispose()
+  }
 }

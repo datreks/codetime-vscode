@@ -9,20 +9,23 @@ import * as vscode from 'vscode'
  * @returns boolean indicating if git commands should be executed
  */
 function shouldExecuteGitCommands(folder: vscode.WorkspaceFolder | null): boolean {
-  if (!folder)
+  if (!folder) {
     return false
+  }
 
   // Get git.autoRepositoryDetection setting
   const config = vscode.workspace.getConfiguration('git')
   const autoRepoDetection = config.get<string | boolean>('autoRepositoryDetection')
 
   // If setting is 'false', don't execute git commands
-  if (autoRepoDetection === false)
+  if (autoRepoDetection === false) {
     return false
+  }
 
   // If setting is 'true' or 'openEditors', always try to execute git commands
-  if (autoRepoDetection === true || autoRepoDetection === 'openEditors')
+  if (autoRepoDetection === true || autoRepoDetection === 'openEditors') {
     return true
+  }
 
   // For 'subFolders' (default), check if .git directory exists in the folder
   if (autoRepoDetection === 'subFolders') {
@@ -37,22 +40,25 @@ function shouldExecuteGitCommands(folder: vscode.WorkspaceFolder | null): boolea
 export function getGitOriginUrl() {
   try {
     const folder = vscode.workspace.workspaceFolders?.[0] ?? null
-    if (!folder || !shouldExecuteGitCommands(folder))
+    if (!folder || !shouldExecuteGitCommands(folder)) {
       return ''
+    }
 
     const gitOriginUrl = execSync('git remote get-url origin', {
       cwd: folder.uri.fsPath,
     }).toString().trim()
     // if is fatal: Not a git repository (or any of the parent directories): .git, return empty string
-    if (gitOriginUrl.includes('fatal:'))
+    if (gitOriginUrl.includes('fatal:')) {
       return ''
+    }
 
     return gitOriginUrl
   }
-  catch (e) {
+  catch (error) {
     // Only log errors that are not related to "not a git repository"
-    if (e instanceof Error && !e.message.includes('fatal: not a git repository'))
-      console.error('getGitOriginUrl error', e)
+    if (error instanceof Error && !error.message.includes('fatal: not a git repository')) {
+      console.error('getGitOriginUrl error', error)
+    }
     return ''
   }
 }
@@ -60,21 +66,24 @@ export function getGitOriginUrl() {
 export function getGitCurrentBranch() {
   try {
     const folder = vscode.workspace.workspaceFolders?.[0] ?? null
-    if (!folder || !shouldExecuteGitCommands(folder))
+    if (!folder || !shouldExecuteGitCommands(folder)) {
       return ''
+    }
 
     const gitBranch = execSync('git rev-parse --abbrev-ref HEAD', {
       cwd: folder.uri.fsPath,
     }).toString().trim()
-    if (gitBranch.includes('fatal:'))
+    if (gitBranch.includes('fatal:')) {
       return ''
+    }
 
     return gitBranch
   }
-  catch (e) {
+  catch (error) {
     // Only log errors that are not related to "not a git repository"
-    if (e instanceof Error && !e.message.includes('fatal: not a git repository'))
-      console.error('getCurrentBranch error', e)
+    if (error instanceof Error && !error.message.includes('fatal: not a git repository')) {
+      console.error('getCurrentBranch error', error)
+    }
     return ''
   }
 }
