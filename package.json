@@ -24,7 +24,7 @@
   "main": "./dist/extension.js",
   "icon": "images/logo.png",
   "engines": {
-    "vscode": "^1.75.0"
+    "vscode": "^1.99.0"
   },
   "activationEvents": [
     "onStartupFinished"
