@@ -1,0 +1,13 @@
+{
+  "Total code time": "Temps de code total",
+  "24h code time": "Temps de code sur 24h",
+  "Today code time": "Temps de code aujourd'hui",
+  "CodeTime: Initializing...": "CodeTime: Initialisation...",
+  "CodeTime: Without Token": "CodeTime: Sans jeton",
+  "Enter Token": "Saisir le jeton",
+  "CodeTime: Head to the dashboard for statistics": "CodeTime: Accéder au tableau de bord pour les statistiques",
+  "CodeTime: Input Your Token (from: codetime.dev)": "CodeTime: Saisissez votre jeton (depuis: codetime.dev)",
+  "CodeTime: Token validation failed": "CodeTime: Échec de la validation du jeton",
+  "CodeTime: Cannot Get Token": "CodeTime: Impossible d'obtenir le jeton",
+  "CodeTime: Token validation succeeded": "CodeTime: Validation du jeton réussie"
+}

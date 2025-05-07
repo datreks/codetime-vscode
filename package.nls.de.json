@@ -1,0 +1,13 @@
+{
+  "extension.name": "CodeTime",
+  "extension.description": "Codetime VSCode-Erweiterung. Codezeit-Statistikanalyse.",
+  "command.getToken": "CodeTime: Token eingeben",
+  "command.toDashboard": "CodeTime: Dashboard anzeigen",
+  "command.codeTimeInStatusBar": "CodeTime: Statusleisten-Information auswählen",
+  "config.title": "CodeTime",
+  "config.statusBarInfo.description": "Wählen Sie die in der Statusleiste anzuzeigende Information.",
+  "config.statusBarInfo.enum.total": "Gesamte Programmierzeit anzeigen",
+  "config.statusBarInfo.enum.today": "Heutige Programmierzeit anzeigen",
+  "config.statusBarInfo.enum.24h": "Programmierzeit der letzten 24 Stunden anzeigen",
+  "config.serverEntrypoint.description": "Der Server-Eingangspunkt definiert die URL, an die Daten gesendet werden."
+}

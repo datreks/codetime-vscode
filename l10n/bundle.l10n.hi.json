@@ -1,0 +1,13 @@
+{
+  "Total code time": "कुल कोडिंग समय",
+  "24h code time": "24 घंटे का कोडिंग समय",
+  "Today code time": "आज का कोडिंग समय",
+  "CodeTime: Initializing...": "CodeTime: प्रारंभ हो रहा है...",
+  "CodeTime: Without Token": "CodeTime: टोकन के बिना",
+  "Enter Token": "टोकन दर्ज करें",
+  "CodeTime: Head to the dashboard for statistics": "CodeTime: आंकड़ों के लिए डैशबोर्ड पर जाएं",
+  "CodeTime: Input Your Token (from: codetime.dev)": "CodeTime: अपना टोकन दर्ज करें (यहां से: codetime.dev)",
+  "CodeTime: Token validation failed": "CodeTime: टोकन सत्यापन विफल",
+  "CodeTime: Cannot Get Token": "CodeTime: टोकन प्राप्त नहीं कर सकता",
+  "CodeTime: Token validation succeeded": "CodeTime: टोकन सत्यापन सफल"
+}

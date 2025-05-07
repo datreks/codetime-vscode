@@ -1,0 +1,13 @@
+{
+  "extension.name": "CodeTime",
+  "extension.description": "Codetime VSCode 插件。代码时间统计分析。",
+  "command.getToken": "CodeTime: 输入令牌",
+  "command.toDashboard": "CodeTime: 浏览仪表盘",
+  "command.codeTimeInStatusBar": "CodeTime: 选择状态栏信息",
+  "config.title": "CodeTime",
+  "config.statusBarInfo.description": "选择在状态栏中显示的信息。",
+  "config.statusBarInfo.enum.total": "显示总代码时间",
+  "config.statusBarInfo.enum.today": "显示今日代码时间",
+  "config.statusBarInfo.enum.24h": "显示24小时代码时间",
+  "config.serverEntrypoint.description": "服务器入口点定义了用于向服务器报告数据的URL。"
+}

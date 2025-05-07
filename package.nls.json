@@ -1,0 +1,13 @@
+{
+  "extension.name": "CodeTime",
+  "extension.description": "Codetime vscode plugin. Statistical analysis of code time.",
+  "command.getToken": "CodeTime: Enter token",
+  "command.toDashboard": "CodeTime: Browse dashboard",
+  "command.codeTimeInStatusBar": "CodeTime: Select status bar info",
+  "config.title": "CodeTime",
+  "config.statusBarInfo.description": "Select the information showing in the status bar.",
+  "config.statusBarInfo.enum.total": "Show total code time",
+  "config.statusBarInfo.enum.today": "Show today code time",
+  "config.statusBarInfo.enum.24h": "Show 24h code time",
+  "config.serverEntrypoint.description": "Server entrypoint defines the URL for reporting data to a server."
+}

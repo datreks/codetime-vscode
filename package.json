@@ -1,14 +1,15 @@
 {
   "publisher": "Jannchie",
   "name": "codetime",
-  "displayName": "CodeTime",
+  "displayName": "%extension.name%",
   "version": "0.9.1",
-  "description": "Codetime vscode plugin. Statistical analysis of code time.",
+  "description": "%extension.description%",
   "homepage": "https://github.com/Data-Trekkers/codetime-vscode#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/Data-Trekkers/codetime-vscode"
   },
+  "l10n": "./l10n",
   "keywords": [
     "code time",
     "code",
@@ -33,19 +34,19 @@
     "commands": [
       {
         "command": "codetime.getToken",
-        "title": "CodeTime: Enter token"
+        "title": "%command.getToken%"
       },
       {
         "command": "codetime.toDashboard",
-        "title": "CodeTime: Browse dashboard"
+        "title": "%command.toDashboard%"
       },
       {
         "command": "codetime.codeTimeInStatusBar",
-        "title": "CodeTime: Select status bar info"
+        "title": "%command.codeTimeInStatusBar%"
       }
     ],
     "configuration": {
-      "title": "CodeTime",
+      "title": "%config.title%",
       "properties": {
         "codetime.statusBarInfo": {
           "type": "string",
@@ -56,16 +57,16 @@
             "24h"
           ],
           "enumDescriptions": [
-            "Show total code time",
-            "Show today code time",
-            "Show 24h code time"
+            "%config.statusBarInfo.enum.total%",
+            "%config.statusBarInfo.enum.today%",
+            "%config.statusBarInfo.enum.24h%"
           ],
-          "description": "Select the information showing in the status bar."
+          "description": "%config.statusBarInfo.description%"
         },
         "codetime.serverEntrypoint": {
           "type": "string",
           "default": "https://api.codetime.dev",
-          "description": "Server entrypoint defines the URL for reporting data to a server."
+          "description": "%config.serverEntrypoint.description%"
         }
       }
     }
@@ -86,6 +87,7 @@
   "dependencies": {
     "@npmcli/fs": "^4.0.0",
     "@types/uuid": "^10.0.0",
+    "@vscode/l10n": "^0.0.18",
     "@vscode/test-electron": "^2.5.2",
     "got": "12.5.3",
     "os-name": "^6.0.0",
@@ -97,6 +99,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.15.11",
     "@types/vscode": "^1.99.1",
+    "@vscode/l10n-dev": "^0.0.35",
     "@vscode/vsce": "^3.3.2",
     "eslint": "^9.26.0",
     "glob": "^11.0.2",

@@ -1,0 +1,13 @@
+{
+  "Total code time": "總編碼時間",
+  "24h code time": "24小時編碼時間",
+  "Today code time": "今日編碼時間",
+  "CodeTime: Initializing...": "CodeTime: 正在初始化...",
+  "CodeTime: Without Token": "CodeTime: 無令牌",
+  "Enter Token": "輸入令牌",
+  "CodeTime: Head to the dashboard for statistics": "CodeTime: 前往統計儀表板",
+  "CodeTime: Input Your Token (from: codetime.dev)": "CodeTime: 請輸入您的令牌（來自：codetime.dev）",
+  "CodeTime: Token validation failed": "CodeTime: 令牌驗證失敗",
+  "CodeTime: Cannot Get Token": "CodeTime: 無法獲取令牌",
+  "CodeTime: Token validation succeeded": "CodeTime: 令牌驗證成功"
+}

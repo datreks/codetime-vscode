@@ -1,0 +1,13 @@
+{
+  "extension.name": "CodeTime",
+  "extension.description": "Codetime VSCode拡張機能。コーディング時間の統計分析。",
+  "command.getToken": "CodeTime: トークンを入力",
+  "command.toDashboard": "CodeTime: ダッシュボードを表示",
+  "command.codeTimeInStatusBar": "CodeTime: ステータスバー情報を選択",
+  "config.title": "CodeTime",
+  "config.statusBarInfo.description": "ステータスバーに表示する情報を選択します。",
+  "config.statusBarInfo.enum.total": "合計コーディング時間を表示",
+  "config.statusBarInfo.enum.today": "今日のコーディング時間を表示",
+  "config.statusBarInfo.enum.24h": "24時間のコーディング時間を表示",
+  "config.serverEntrypoint.description": "サーバーエントリポイントは、サーバーにデータを報告するために使用されるURLを定義します。"
+}

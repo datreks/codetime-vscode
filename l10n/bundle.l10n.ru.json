@@ -1,0 +1,13 @@
+{
+  "Total code time": "Общее время кодирования",
+  "24h code time": "Время кодирования за 24ч",
+  "Today code time": "Время кодирования сегодня",
+  "CodeTime: Initializing...": "CodeTime: Инициализация...",
+  "CodeTime: Without Token": "CodeTime: Без токена",
+  "Enter Token": "Ввести токен",
+  "CodeTime: Head to the dashboard for statistics": "CodeTime: Перейти на панель статистики",
+  "CodeTime: Input Your Token (from: codetime.dev)": "CodeTime: Введите ваш токен (из: codetime.dev)",
+  "CodeTime: Token validation failed": "CodeTime: Проверка токена не удалась",
+  "CodeTime: Cannot Get Token": "CodeTime: Невозможно получить токен",
+  "CodeTime: Token validation succeeded": "CodeTime: Проверка токена успешна"
+}

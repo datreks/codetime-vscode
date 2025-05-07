@@ -1,0 +1,13 @@
+{
+  "extension.name": "CodeTime",
+  "extension.description": "Codetime VSCode 擴充功能。編碼時間統計分析。",
+  "command.getToken": "CodeTime: 輸入令牌",
+  "command.toDashboard": "CodeTime: 瀏覽儀表板",
+  "command.codeTimeInStatusBar": "CodeTime: 選擇狀態列資訊",
+  "config.title": "CodeTime",
+  "config.statusBarInfo.description": "選擇在狀態列中顯示的資訊。",
+  "config.statusBarInfo.enum.total": "顯示總編碼時間",
+  "config.statusBarInfo.enum.today": "顯示今日編碼時間",
+  "config.statusBarInfo.enum.24h": "顯示24小時編碼時間",
+  "config.serverEntrypoint.description": "伺服器入口點定義了用於向伺服器報告數據的URL。"
+}

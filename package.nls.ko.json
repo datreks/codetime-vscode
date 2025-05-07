@@ -1,0 +1,13 @@
+{
+  "extension.name": "CodeTime",
+  "extension.description": "Codetime VSCode 확장 프로그램. 코딩 시간 통계 분석.",
+  "command.getToken": "CodeTime: 토큰 입력",
+  "command.toDashboard": "CodeTime: 대시보드 보기",
+  "command.codeTimeInStatusBar": "CodeTime: 상태 표시줄 정보 선택",
+  "config.title": "CodeTime",
+  "config.statusBarInfo.description": "상태 표시줄에 표시할 정보를 선택합니다.",
+  "config.statusBarInfo.enum.total": "총 코딩 시간 표시",
+  "config.statusBarInfo.enum.today": "오늘의 코딩 시간 표시",
+  "config.statusBarInfo.enum.24h": "24시간 코딩 시간 표시",
+  "config.serverEntrypoint.description": "서버 진입점은 서버에 데이터를 보고하는 데 사용되는 URL을 정의합니다."
+}

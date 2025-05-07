@@ -1,0 +1,13 @@
+{
+  "Total code time": "合計コーディング時間",
+  "24h code time": "24時間コーディング時間",
+  "Today code time": "今日のコーディング時間",
+  "CodeTime: Initializing...": "CodeTime: 初期化中...",
+  "CodeTime: Without Token": "CodeTime: トークンなし",
+  "Enter Token": "トークンを入力",
+  "CodeTime: Head to the dashboard for statistics": "CodeTime: 統計情報のダッシュボードへ",
+  "CodeTime: Input Your Token (from: codetime.dev)": "CodeTime: トークンを入力してください（取得元: codetime.dev）",
+  "CodeTime: Token validation failed": "CodeTime: トークン検証に失敗しました",
+  "CodeTime: Cannot Get Token": "CodeTime: トークンを取得できません",
+  "CodeTime: Token validation succeeded": "CodeTime: トークン検証に成功しました"
+}

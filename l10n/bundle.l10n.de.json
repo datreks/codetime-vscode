@@ -1,0 +1,13 @@
+{
+  "Total code time": "Gesamte Programmierzeit",
+  "24h code time": "Programmierzeit (24 Stunden)",
+  "Today code time": "Programmierzeit (heute)",
+  "CodeTime: Initializing...": "CodeTime: Initialisierung...",
+  "CodeTime: Without Token": "CodeTime: Ohne Token",
+  "Enter Token": "Token eingeben",
+  "CodeTime: Head to the dashboard for statistics": "CodeTime: Zum Dashboard für Statistiken",
+  "CodeTime: Input Your Token (from: codetime.dev)": "CodeTime: Geben Sie Ihren Token ein (von: codetime.dev)",
+  "CodeTime: Token validation failed": "CodeTime: Token-Validierung fehlgeschlagen",
+  "CodeTime: Cannot Get Token": "CodeTime: Token konnte nicht abgerufen werden",
+  "CodeTime: Token validation succeeded": "CodeTime: Token-Validierung erfolgreich"
+}

@@ -26,7 +26,7 @@ export class CodeTime {
     vscode.window
       .showInputBox({
         password: true,
-        placeHolder: 'CodeTime: Input Your Token (from: codetime.dev)',
+        placeHolder: vscode.l10n.t('CodeTime: Input Your Token (from: codetime.dev)'),
       })
       .then((token) => {
         if (token && this.isToken(token)) {
@@ -35,9 +35,9 @@ export class CodeTime {
           this.getCurrentDuration(true)
         }
         else {
-          vscode.window.showErrorMessage('CodeTime: Token validation failed')
-          this.statusBar.text = '$(clock) CodeTime: Cannot Get Token'
-          this.statusBar.tooltip = 'Enter Token'
+          vscode.window.showErrorMessage(vscode.l10n.t('CodeTime: Token validation failed'))
+          this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Cannot Get Token')}`
+          this.statusBar.tooltip = vscode.l10n.t('Enter Token')
           this.statusBar.command = 'codetime.getToken'
           this.token = ''
         }
@@ -99,7 +99,7 @@ export class CodeTime {
   }
 
   private init(): void {
-    this.statusBar.text = '$(clock) CodeTime: Initializing...'
+    this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Initializing...')}`
     this.statusBar.show()
     this.setupEventListeners()
     this.getCurrentDuration()
@@ -246,19 +246,19 @@ export class CodeTime {
   private getCurrentDuration(showSuccess = false) {
     const key = vscode.workspace.getConfiguration('codetime').statusBarInfo
     if (this.token === '') {
-      this.statusBar.text = '$(clock) CodeTime: Without Token'
-      this.statusBar.tooltip = 'Enter Token'
+      this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Without Token')}`
+      this.statusBar.tooltip = vscode.l10n.t('Enter Token')
       this.statusBar.command = 'codetime.getToken'
       return
     }
     this.statusBar.command = 'codetime.toDashboard'
-    this.statusBar.tooltip = 'CodeTime: Head to the dashboard for statistics'
+    this.statusBar.tooltip = vscode.l10n.t('CodeTime: Head to the dashboard for statistics')
     const minutes = getMinutes(key)
     this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then((res: { body: { minutes: any } }) => {
       const { minutes } = res.body
       this.statusBar.text = `$(watch) ${getDurationText(minutes * 60 * 1000)}`
       if (showSuccess) {
-        vscode.window.showInformationMessage('CodeTime: Token validation succeeded')
+        vscode.window.showInformationMessage(vscode.l10n.t('CodeTime: Token validation succeeded'))
       }
     })
   }
@@ -266,17 +266,21 @@ export class CodeTime {
   public codeTimeInStatBar() {
     vscode.window
       .showQuickPick(
-        ['Total code time', '24h code time', 'Today code time'],
+        [
+          vscode.l10n.t('Total code time'),
+          vscode.l10n.t('24h code time'),
+          vscode.l10n.t('Today code time'),
+        ],
         {},
       )
       .then((v) => {
         let key = 'total'
         switch (v) {
-          case '24h code time': {
+          case vscode.l10n.t('24h code time'): {
             key = '24h'
             break
           }
-          case 'Today code time': {
+          case vscode.l10n.t('Today code time'): {
             key = 'today'
             break
           }

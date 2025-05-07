@@ -1,0 +1,13 @@
+{
+  "extension.name": "CodeTime",
+  "extension.description": "Расширение Codetime для VSCode. Статистический анализ времени кодирования.",
+  "command.getToken": "CodeTime: Ввести токен",
+  "command.toDashboard": "CodeTime: Просмотр панели",
+  "command.codeTimeInStatusBar": "CodeTime: Выбрать информацию в строке состояния",
+  "config.title": "CodeTime",
+  "config.statusBarInfo.description": "Выберите информацию для отображения в строке состояния.",
+  "config.statusBarInfo.enum.total": "Показать общее время кодирования",
+  "config.statusBarInfo.enum.today": "Показать время кодирования сегодня",
+  "config.statusBarInfo.enum.24h": "Показать время кодирования за 24 часа",
+  "config.serverEntrypoint.description": "Точка входа сервера определяет URL, используемый для отправки данных на сервер."
+}
