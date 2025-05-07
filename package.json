@@ -2,7 +2,7 @@
   "publisher": "Jannchie",
   "name": "codetime",
   "displayName": "%extension.name%",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "%extension.description%",
   "homepage": "https://github.com/Data-Trekkers/codetime-vscode#readme",
   "repository": {
