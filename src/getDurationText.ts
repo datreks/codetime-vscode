@@ -1,45 +1,38 @@
-const MS_OF_HOUR = 3_600_000
-const MS_OF_MINUTE = 60_000
-export function getDurationText(ms: number): string {
-  let result = ''
+import { formatDuration } from 'date-fns'
 
-  if (ms > MS_OF_HOUR) {
-    // 超过1小时
-    if (result !== '') {
-      result += ' '
-    }
+const localeMap: Record<string, () => Promise<any>> = {
+  'en-US': () => import('date-fns/locale/en-US').then(m => m.default),
+  'zh-CN': () => import('date-fns/locale/zh-CN').then(m => m.default),
+  'zh-TW': () => import('date-fns/locale/zh-TW').then(m => m.default),
+  'ja': () => import('date-fns/locale/ja').then(m => m.default),
+  'de': () => import('date-fns/locale/de').then(m => m.default),
+  'fr': () => import('date-fns/locale/fr').then(m => m.default),
+  'es': () => import('date-fns/locale/es').then(m => m.default),
+  'it': () => import('date-fns/locale/it').then(m => m.default),
+  'pt-BR': () => import('date-fns/locale/pt-BR').then(m => m.default),
+  'ru': () => import('date-fns/locale/ru').then(m => m.default),
+  'ko': () => import('date-fns/locale/ko').then(m => m.default),
+  'hi': () => import('date-fns/locale/hi').then(m => m.default),
+}
 
-    const hour = Math.floor(ms / MS_OF_HOUR)
-    result += `${hour}hr`
-    if (hour > 1) {
-      result += 's'
-    }
+async function getLocale(locale: string = 'en') {
+  const key = Object.keys(localeMap).find(k => k.toLowerCase() === locale.toLowerCase()) || 'en-US'
+  return await localeMap[key]()
+}
 
-    ms %= MS_OF_HOUR
-  }
-  if (ms > MS_OF_MINUTE) {
-    if (result !== '') {
-      result += ' '
-    }
-
-    // 超过1分钟
-    const minute = Math.floor(ms / MS_OF_MINUTE)
-    result += `${minute}min`
-    if (minute > 1) {
-      result += 's'
-    }
-
-    ms %= MS_OF_MINUTE
-  }
-  if (result !== '') {
-    return result
-  }
-
-  const s = Math.floor(ms / 1000)
-  result += `${s}sec`
-  if (s > 1) {
-    result += 's'
-  }
-
-  return result
+/**
+ * 获取本地化的“xh ym”时长文本
+ * @param minutes 分钟数
+ * @param locale 语言（如 "en"、"zh-CN"、"ja"），默认 "en"
+ * @returns Promise<string>
+ */
+export async function getDurationText(minutes: number, locale: string = 'en'): Promise<string> {
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+  const l = await getLocale(locale)
+  const text = formatDuration(
+    { hours, minutes: mins },
+    { locale: l, format: ['hours', 'minutes'], zero: false },
+  )
+  return text || formatDuration({ minutes: 0 }, { locale: l, format: ['minutes'] })
 }

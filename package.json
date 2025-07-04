@@ -50,10 +50,10 @@
       "properties": {
         "codetime.statusBarInfo": {
           "type": "string",
-          "default": "total",
+          "default": "Total",
           "enum": [
-            "total",
-            "today",
+            "Total",
+            "Today",
             "24h"
           ],
           "enumDescriptions": [
@@ -67,6 +67,42 @@
           "type": "string",
           "default": "https://api.codetime.dev",
           "description": "%config.serverEntrypoint.description%"
+        },
+        "codetime.displayLanguage": {
+          "type": "string",
+          "default": "Auto",
+          "enum": [
+            "Auto",
+            "zh-CN",
+            "en",
+            "ja",
+            "de",
+            "fr",
+            "es",
+            "it",
+            "pt-BR",
+            "ru",
+            "ko",
+            "hi",
+            "zh-TW"
+          ],
+          "enumDescriptions": [
+            "%codetime.displayLanguage.enum.auto%",
+            "%codetime.displayLanguage.enum.zh-cn%",
+            "%codetime.displayLanguage.enum.en%",
+            "%codetime.displayLanguage.enum.ja%",
+            "%codetime.displayLanguage.enum.de%",
+            "%codetime.displayLanguage.enum.fr%",
+            "%codetime.displayLanguage.enum.es%",
+            "%codetime.displayLanguage.enum.it%",
+            "%codetime.displayLanguage.enum.pt-br%",
+            "%codetime.displayLanguage.enum.ru%",
+            "%codetime.displayLanguage.enum.ko%",
+            "%codetime.displayLanguage.enum.hi%",
+            "%codetime.displayLanguage.enum.zh-tw%"
+          ],
+          "title": "%codetime.displayLanguage.title%",
+          "description": "%codetime.displayLanguage.description%"
         }
       }
     }
@@ -89,12 +125,14 @@
     "@types/uuid": "^10.0.0",
     "@vscode/l10n": "^0.0.18",
     "@vscode/test-electron": "^2.5.2",
+    "date-fns": "^3.6.0",
     "got": "12.5.3",
     "os-name": "^6.0.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@jannchie/eslint-config": "^3.6.1",
+    "@types/date-fns": "^2.5.3",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.15.11",

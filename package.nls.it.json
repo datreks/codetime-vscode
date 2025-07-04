@@ -9,5 +9,20 @@
   "config.statusBarInfo.enum.total": "Mostra tempo totale di codifica",
   "config.statusBarInfo.enum.today": "Mostra tempo di codifica di oggi",
   "config.statusBarInfo.enum.24h": "Mostra tempo di codifica nelle 24 ore",
-  "config.serverEntrypoint.description": "Il punto di ingresso del server definisce l'URL utilizzato per inviare dati al server."
+  "config.serverEntrypoint.description": "Il punto di ingresso del server definisce l'URL utilizzato per inviare dati al server.",
+  "codetime.displayLanguage": "Lingua di visualizzazione",
+  "codetime.displayLanguage.description": "Seleziona la lingua di visualizzazione dell'estensione CodeTime.",
+  "codetime.displayLanguage.enum.zh-cn": "Cinese (semplificato)",
+  "codetime.displayLanguage.enum.en": "Inglese",
+  "codetime.displayLanguage.enum.ja": "Giapponese",
+  "codetime.displayLanguage.enum.de": "Tedesco",
+  "codetime.displayLanguage.enum.fr": "Francese",
+  "codetime.displayLanguage.enum.es": "Spagnolo",
+  "codetime.displayLanguage.enum.it": "Italiano",
+  "codetime.displayLanguage.enum.pt-br": "Portoghese (Brasile)",
+  "codetime.displayLanguage.enum.ru": "Russo",
+  "codetime.displayLanguage.enum.ko": "Coreano",
+  "codetime.displayLanguage.enum.hi": "Hindi",
+  "codetime.displayLanguage.enum.zh-tw": "Cinese (tradizionale)",
+  "codetime.displayLanguage.enum.auto": "Automatico (segui la lingua di VSCode)"
 }

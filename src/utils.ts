@@ -27,14 +27,8 @@ function shouldExecuteGitCommands(folder: vscode.WorkspaceFolder | null): boolea
     return true
   }
 
-  // For 'subFolders' (default), check if .git directory exists in the folder
-  if (autoRepoDetection === 'subFolders') {
-    const gitDir = path.join(folder.uri.fsPath, '.git')
-    return fs.existsSync(gitDir)
-  }
-
-  // Default to true if setting is unrecognized
-  return true
+  const gitDir = path.join(folder.uri.fsPath, '.git')
+  return fs.existsSync(gitDir)
 }
 
 export function getGitOriginUrl() {
@@ -57,6 +51,9 @@ export function getGitOriginUrl() {
   catch (error) {
     // Only log errors that are not related to "not a git repository"
     if (error instanceof Error && !error.message.includes('fatal: not a git repository')) {
+      console.error('getGitOriginUrl error', error)
+    }
+    if (error instanceof Error && error.message.includes('No such remote \'origin\'')) {
       console.error('getGitOriginUrl error', error)
     }
     return ''

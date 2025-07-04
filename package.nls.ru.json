@@ -9,5 +9,20 @@
   "config.statusBarInfo.enum.total": "Показать общее время кодирования",
   "config.statusBarInfo.enum.today": "Показать время кодирования сегодня",
   "config.statusBarInfo.enum.24h": "Показать время кодирования за 24 часа",
-  "config.serverEntrypoint.description": "Точка входа сервера определяет URL, используемый для отправки данных на сервер."
+  "config.serverEntrypoint.description": "Точка входа сервера определяет URL, используемый для отправки данных на сервер.",
+  "codetime.displayLanguage": "Язык отображения",
+  "codetime.displayLanguage.description": "Выберите язык отображения расширения CodeTime.",
+  "codetime.displayLanguage.enum.zh-cn": "Китайский (упрощённый)",
+  "codetime.displayLanguage.enum.en": "Английский",
+  "codetime.displayLanguage.enum.ja": "Японский",
+  "codetime.displayLanguage.enum.de": "Немецкий",
+  "codetime.displayLanguage.enum.fr": "Французский",
+  "codetime.displayLanguage.enum.es": "Испанский",
+  "codetime.displayLanguage.enum.it": "Итальянский",
+  "codetime.displayLanguage.enum.pt-br": "Португальский (Бразилия)",
+  "codetime.displayLanguage.enum.ru": "Русский",
+  "codetime.displayLanguage.enum.ko": "Корейский",
+  "codetime.displayLanguage.enum.hi": "Хинди",
+  "codetime.displayLanguage.enum.zh-tw": "Китайский (традиционный)",
+  "codetime.displayLanguage.enum.auto": "Автоматически (следовать языку VSCode)"
 }

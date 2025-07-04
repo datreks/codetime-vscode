@@ -251,12 +251,16 @@ export class CodeTime {
       this.statusBar.command = 'codetime.getToken'
       return
     }
+    let currentLanguage = vscode.workspace.getConfiguration('codetime').displayLanguage
+    if (currentLanguage === 'Auto') {
+      currentLanguage = vscode.env.language
+    }
     this.statusBar.command = 'codetime.toDashboard'
     this.statusBar.tooltip = vscode.l10n.t('CodeTime: Head to the dashboard for statistics')
     const minutes = getMinutes(key)
-    this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then((res: { body: { minutes: any } }) => {
+    this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then(async (res: { body: { minutes: any } }) => {
       const { minutes } = res.body
-      this.statusBar.text = `$(watch) ${getDurationText(minutes * 60 * 1000)}`
+      this.statusBar.text = `$(watch) ${await getDurationText(minutes, currentLanguage)}`
       if (showSuccess) {
         vscode.window.showInformationMessage(vscode.l10n.t('CodeTime: Token validation succeeded'))
       }
@@ -274,14 +278,14 @@ export class CodeTime {
         {},
       )
       .then((v) => {
-        let key = 'total'
+        let key = 'Total'
         switch (v) {
           case vscode.l10n.t('24h code time'): {
             key = '24h'
             break
           }
           case vscode.l10n.t('Today code time'): {
-            key = 'today'
+            key = 'Today'
             break
           }
           default: {
@@ -305,7 +309,7 @@ export class CodeTime {
 function getMinutes(key: string) {
   let minutes = 60 * 24
   switch (key) {
-    case 'today': {
+    case 'Today': {
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
       const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }))
       const hours = now.getHours()
@@ -313,7 +317,7 @@ function getMinutes(key: string) {
       minutes += hours * 60
       break
     }
-    case 'total': {
+    case 'Total': {
       minutes = 60 * 24 * 365 * 100
       break
     }

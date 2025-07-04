@@ -9,5 +9,20 @@
   "config.statusBarInfo.enum.total": "कुल कोडिंग समय दिखाएं",
   "config.statusBarInfo.enum.today": "आज का कोडिंग समय दिखाएं",
   "config.statusBarInfo.enum.24h": "24 घंटे का कोडिंग समय दिखाएं",
-  "config.serverEntrypoint.description": "सर्वर एंट्रीपॉइंट वह URL परिभाषित करता है जिसका उपयोग सर्वर को डेटा रिपोर्ट करने के लिए किया जाता है।"
+  "config.serverEntrypoint.description": "सर्वर एंट्रीपॉइंट वह URL परिभाषित करता है जिसका उपयोग सर्वर को डेटा रिपोर्ट करने के लिए किया जाता है।",
+  "codetime.displayLanguage": "प्रदर्शन भाषा",
+  "codetime.displayLanguage.description": "CodeTime एक्सटेंशन की प्रदर्शन भाषा चुनें।",
+  "codetime.displayLanguage.enum.zh-cn": "चीनी (सरलीकृत)",
+  "codetime.displayLanguage.enum.en": "अंग्रेज़ी",
+  "codetime.displayLanguage.enum.ja": "जापानी",
+  "codetime.displayLanguage.enum.de": "जर्मन",
+  "codetime.displayLanguage.enum.fr": "फ्रेंच",
+  "codetime.displayLanguage.enum.es": "स्पेनिश",
+  "codetime.displayLanguage.enum.it": "इतालवी",
+  "codetime.displayLanguage.enum.pt-br": "पुर्तगाली (ब्राज़ील)",
+  "codetime.displayLanguage.enum.ru": "रूसी",
+  "codetime.displayLanguage.enum.ko": "कोरियाई",
+  "codetime.displayLanguage.enum.hi": "हिंदी",
+  "codetime.displayLanguage.enum.zh-tw": "चीनी (परंपरागत)",
+  "codetime.displayLanguage.enum.auto": "स्वचालित (VSCode भाषा के अनुसार)"
 }

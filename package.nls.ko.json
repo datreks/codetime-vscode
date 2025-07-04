@@ -9,5 +9,20 @@
   "config.statusBarInfo.enum.total": "총 코딩 시간 표시",
   "config.statusBarInfo.enum.today": "오늘의 코딩 시간 표시",
   "config.statusBarInfo.enum.24h": "24시간 코딩 시간 표시",
-  "config.serverEntrypoint.description": "서버 진입점은 서버에 데이터를 보고하는 데 사용되는 URL을 정의합니다."
+  "config.serverEntrypoint.description": "서버 진입점은 서버에 데이터를 보고하는 데 사용되는 URL을 정의합니다.",
+  "codetime.displayLanguage": "표시 언어",
+  "codetime.displayLanguage.description": "CodeTime 확장 프로그램의 표시 언어를 선택하세요.",
+  "codetime.displayLanguage.enum.zh-cn": "중국어(간체)",
+  "codetime.displayLanguage.enum.en": "영어",
+  "codetime.displayLanguage.enum.ja": "일본어",
+  "codetime.displayLanguage.enum.de": "독일어",
+  "codetime.displayLanguage.enum.fr": "프랑스어",
+  "codetime.displayLanguage.enum.es": "스페인어",
+  "codetime.displayLanguage.enum.it": "이탈리아어",
+  "codetime.displayLanguage.enum.pt-br": "포르투갈어(브라질)",
+  "codetime.displayLanguage.enum.ru": "러시아어",
+  "codetime.displayLanguage.enum.ko": "한국어",
+  "codetime.displayLanguage.enum.hi": "힌디어",
+  "codetime.displayLanguage.enum.zh-tw": "중국어(번체)",
+  "codetime.displayLanguage.enum.auto": "자동(VSCode 언어 따름)"
 }

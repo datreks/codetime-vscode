@@ -9,5 +9,20 @@
   "config.statusBarInfo.enum.total": "顯示總編碼時間",
   "config.statusBarInfo.enum.today": "顯示今日編碼時間",
   "config.statusBarInfo.enum.24h": "顯示24小時編碼時間",
-  "config.serverEntrypoint.description": "伺服器入口點定義了用於向伺服器報告數據的URL。"
+  "config.serverEntrypoint.description": "伺服器入口點定義了用於向伺服器報告數據的URL。",
+  "codetime.displayLanguage": "顯示語言",
+  "codetime.displayLanguage.description": "選擇 CodeTime 擴充功能的顯示語言。",
+  "codetime.displayLanguage.enum.zh-cn": "簡體中文",
+  "codetime.displayLanguage.enum.en": "英文",
+  "codetime.displayLanguage.enum.ja": "日文",
+  "codetime.displayLanguage.enum.de": "德文",
+  "codetime.displayLanguage.enum.fr": "法文",
+  "codetime.displayLanguage.enum.es": "西班牙文",
+  "codetime.displayLanguage.enum.it": "義大利文",
+  "codetime.displayLanguage.enum.pt-br": "葡萄牙文（巴西）",
+  "codetime.displayLanguage.enum.ru": "俄文",
+  "codetime.displayLanguage.enum.ko": "韓文",
+  "codetime.displayLanguage.enum.hi": "印地語",
+  "codetime.displayLanguage.enum.zh-tw": "繁體中文",
+  "codetime.displayLanguage.enum.auto": "自動（依 VSCode 語言）"
 }
