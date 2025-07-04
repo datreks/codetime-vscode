@@ -10,7 +10,7 @@
   "config.statusBarInfo.enum.today": "Показать время кодирования сегодня",
   "config.statusBarInfo.enum.24h": "Показать время кодирования за 24 часа",
   "config.serverEntrypoint.description": "Точка входа сервера определяет URL, используемый для отправки данных на сервер.",
-  "codetime.displayLanguage": "Язык отображения",
+  "codetime.displayLanguage.title": "Язык отображения",
   "codetime.displayLanguage.description": "Выберите язык отображения расширения CodeTime.",
   "codetime.displayLanguage.enum.zh-cn": "Китайский (упрощённый)",
   "codetime.displayLanguage.enum.en": "Английский",

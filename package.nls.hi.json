@@ -10,7 +10,7 @@
   "config.statusBarInfo.enum.today": "आज का कोडिंग समय दिखाएं",
   "config.statusBarInfo.enum.24h": "24 घंटे का कोडिंग समय दिखाएं",
   "config.serverEntrypoint.description": "सर्वर एंट्रीपॉइंट वह URL परिभाषित करता है जिसका उपयोग सर्वर को डेटा रिपोर्ट करने के लिए किया जाता है।",
-  "codetime.displayLanguage": "प्रदर्शन भाषा",
+  "codetime.displayLanguage.title": "प्रदर्शन भाषा",
   "codetime.displayLanguage.description": "CodeTime एक्सटेंशन की प्रदर्शन भाषा चुनें।",
   "codetime.displayLanguage.enum.zh-cn": "चीनी (सरलीकृत)",
   "codetime.displayLanguage.enum.en": "अंग्रेज़ी",

@@ -10,7 +10,7 @@
   "config.statusBarInfo.enum.today": "显示今日代码时间",
   "config.statusBarInfo.enum.24h": "显示24小时代码时间",
   "config.serverEntrypoint.description": "服务器入口点定义了用于向服务器报告数据的URL。",
-  "codetime.displayLanguage": "显示语言",
+  "codetime.displayLanguage.title": "显示语言",
   "codetime.displayLanguage.description": "选择 CodeTime 插件界面显示的语言。",
   "codetime.displayLanguage.enum.zh-cn": "简体中文",
   "codetime.displayLanguage.enum.en": "英语",

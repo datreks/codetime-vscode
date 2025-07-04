@@ -10,7 +10,7 @@
   "config.statusBarInfo.enum.today": "Mostrar tiempo de código de hoy",
   "config.statusBarInfo.enum.24h": "Mostrar tiempo de código de 24 horas",
   "config.serverEntrypoint.description": "El punto de entrada del servidor define la URL utilizada para reportar datos al servidor.",
-  "codetime.displayLanguage": "Idioma de visualización",
+  "codetime.displayLanguage.title": "Idioma de visualización",
   "codetime.displayLanguage.description": "Seleccione el idioma de visualización de la extensión CodeTime.",
   "codetime.displayLanguage.enum.zh-cn": "Chino (simplificado)",
   "codetime.displayLanguage.enum.en": "Inglés",

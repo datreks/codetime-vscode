@@ -10,7 +10,7 @@
   "config.statusBarInfo.enum.today": "今日のコーディング時間を表示",
   "config.statusBarInfo.enum.24h": "24時間のコーディング時間を表示",
   "config.serverEntrypoint.description": "サーバーエントリポイントは、サーバーにデータを報告するために使用されるURLを定義します。",
-  "codetime.displayLanguage": "表示言語",
+  "codetime.displayLanguage.title": "表示言語",
   "codetime.displayLanguage.description": "CodeTime拡張機能の表示言語を選択します。",
   "codetime.displayLanguage.enum.zh-cn": "中国語（簡体字）",
   "codetime.displayLanguage.enum.en": "英語",

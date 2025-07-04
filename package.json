@@ -68,7 +68,7 @@
           "default": "https://api.codetime.dev",
           "description": "%config.serverEntrypoint.description%"
         },
-        "codetime.displayLanguage": {
+        "codetime.displayLanguage.title": {
           "type": "string",
           "default": "Auto",
           "enum": [

@@ -10,7 +10,7 @@
   "config.statusBarInfo.enum.today": "Heutige Programmierzeit anzeigen",
   "config.statusBarInfo.enum.24h": "Programmierzeit der letzten 24 Stunden anzeigen",
   "config.serverEntrypoint.description": "Der Server-Eingangspunkt definiert die URL, an die Daten gesendet werden.",
-  "codetime.displayLanguage": "Anzeigesprache",
+  "codetime.displayLanguage.title": "Anzeigesprache",
   "codetime.displayLanguage.description": "Wählen Sie die Anzeigesprache der CodeTime-Erweiterung.",
   "codetime.displayLanguage.enum.zh-cn": "Chinesisch (vereinfacht)",
   "codetime.displayLanguage.enum.en": "Englisch",
