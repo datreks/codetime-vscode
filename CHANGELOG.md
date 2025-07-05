@@ -1,3 +1,11 @@
+## v0.11.3
+
+[v0.11.2...v0.11.3](https://github.com/datreks/codetime-vscode/compare/v0.11.2...v0.11.3)
+
+### :sparkles: Features
+
+- **codetime**: use git origin and branch in data payload - By [Jianqi Pan](mailto:jannchie@gmail.com) in [f33bd09](https://github.com/datreks/codetime-vscode/commit/f33bd09)
+
 ## v0.11.2
 
 [v0.11.1...v0.11.2](https://github.com/datreks/codetime-vscode/compare/v0.11.1...v0.11.2)
