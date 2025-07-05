@@ -14,6 +14,7 @@ export class CodeTime {
   osName = osName()
   out: vscode.OutputChannel = vscode.window.createOutputChannel('Codetime')
   private debounceTimer?: NodeJS.Timeout
+  private secrets: vscode.SecretStorage
 
   private debounce(func: any, wait: number) {
     return (...args: any) => {
@@ -22,26 +23,24 @@ export class CodeTime {
     }
   }
 
-  setToken() {
-    vscode.window
-      .showInputBox({
-        password: true,
-        placeHolder: vscode.l10n.t('CodeTime: Input Your Token (from: codetime.dev)'),
-      })
-      .then((token) => {
-        if (token) {
-          this.state.update('token', token)
-          this.token = token
-          this.getCurrentDuration(true)
-        }
-        else {
-          vscode.window.showErrorMessage(vscode.l10n.t('CodeTime: Token validation failed'))
-          this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Cannot Get Token')}`
-          this.statusBar.tooltip = vscode.l10n.t('Enter Token')
-          this.statusBar.command = 'codetime.getToken'
-          this.token = ''
-        }
-      })
+  async setToken() {
+    const token = await vscode.window.showInputBox({
+      password: true,
+      placeHolder: vscode.l10n.t('CodeTime: Input Your Token (from: codetime.dev)'),
+    })
+
+    if (token && this.isToken(token)) {
+      await this.secrets.store('codetime.token', token)
+      this.token = token
+      this.getCurrentDuration(true)
+    }
+    else {
+      vscode.window.showErrorMessage(vscode.l10n.t('CodeTime: Token validation failed'))
+      this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Cannot Get Token')}`
+      this.statusBar.tooltip = vscode.l10n.t('Enter Token')
+      this.statusBar.command = 'codetime.getToken'
+      this.token = ''
+    }
   }
 
   private statusBar: vscode.StatusBarItem = vscode.window.createStatusBarItem(
@@ -50,33 +49,35 @@ export class CodeTime {
 
   public disposable!: vscode.Disposable
   state: vscode.Memento
-  client: Got
+  client!: Got
   userId: number
   token: string = ''
   inter!: NodeJS.Timeout
-  session: string
-  constructor(state: vscode.Memento) {
+  session!: string
+  constructor(state: vscode.Memento, secrets: vscode.SecretStorage) {
     this.state = state
+    this.secrets = secrets
     this.userId = this.getUserId()
-    this.initSetToken()
-    this.client = got.extend({
-      prefixUrl: vscode.workspace.getConfiguration('codetime').serverEntrypoint,
-      responseType: 'json',
-      headers: {
-        'User-Agent': 'CodeTime Client',
-      },
-      hooks: {
-        beforeRequest: [
-          (options: any) => {
-            if (options.headers) {
-              options.headers.token = this.token
-            }
-          },
-        ],
-      },
+    this.initSetToken().then(() => {
+      this.client = got.extend({
+        prefixUrl: vscode.workspace.getConfiguration('codetime').serverEntrypoint,
+        responseType: 'json',
+        headers: {
+          'User-Agent': 'CodeTime Client',
+        },
+        hooks: {
+          beforeRequest: [
+            (options: any) => {
+              if (options.headers) {
+                options.headers.token = this.token
+              }
+            },
+          ],
+        },
+      })
+      this.session = v4()
+      this.init()
     })
-    this.session = v4()
-    this.init()
   }
 
   getUserId(): number {
@@ -89,10 +90,26 @@ export class CodeTime {
     )
   }
 
-  initSetToken() {
-    const stateToken = this.state.get<string>('token')
+  async initSetToken() {
+    const secretToken = await this.secrets.get('codetime.token')
     const envToken = process.env.CODETIME_TOKEN
-    this.token = envToken || (stateToken || '')
+
+    if (secretToken && this.isToken(secretToken)) {
+      this.token = secretToken
+    }
+    else if (envToken && this.isToken(envToken)) {
+      this.token = envToken
+      await this.secrets.store('codetime.token', envToken)
+    }
+    else {
+      const stateToken = this.state.get<string>('token')
+      if (stateToken && this.isToken(stateToken)) {
+        this.token = stateToken
+        await this.secrets.store('codetime.token', stateToken)
+        this.state.update('token', undefined)
+      }
+    }
+
     if (this.token === '') {
       this.setToken()
     }
@@ -232,10 +249,20 @@ export class CodeTime {
             gitBranch: branch,
             operationType: this.getOperationType(eventName),
           }
-          this.out.appendLine(JSON.stringify(data))
+          this.out.appendLine(JSON.stringify({ ...data, token: undefined }))
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((error: { response: { statusCode: number } }) => {
-            this.out.appendLine(`Error: ${error}`)
+            if (error.response?.statusCode === 401) {
+              this.out.appendLine('Token authentication failed')
+              this.token = ''
+              this.secrets.delete('codetime.token')
+              this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Token Invalid')}`
+              this.statusBar.tooltip = vscode.l10n.t('Enter Token')
+              this.statusBar.command = 'codetime.getToken'
+            }
+            else {
+              this.out.appendLine(`Error: ${error}`)
+            }
             // TODO: Append Data To Local
           })
         }
@@ -245,7 +272,7 @@ export class CodeTime {
 
   private getCurrentDuration(showSuccess = false) {
     const key = vscode.workspace.getConfiguration('codetime').statusBarInfo
-    if (this.token === '') {
+    if (this.token === '' || !this.isToken(this.token)) {
       this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Without Token')}`
       this.statusBar.tooltip = vscode.l10n.t('Enter Token')
       this.statusBar.command = 'codetime.getToken'
@@ -264,6 +291,13 @@ export class CodeTime {
       if (showSuccess) {
         vscode.window.showInformationMessage(vscode.l10n.t('CodeTime: Token validation succeeded'))
       }
+    }).catch((error) => {
+      this.out.appendLine(`Token validation failed: ${error.message || error}`)
+      this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Token Invalid')}`
+      this.statusBar.tooltip = vscode.l10n.t('Enter Token')
+      this.statusBar.command = 'codetime.getToken'
+      this.token = ''
+      this.secrets.delete('codetime.token')
     })
   }
 

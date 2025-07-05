@@ -60,7 +60,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // 动态加载本地化资源
   await loadLocalizationResources(context, language)
 
-  codetime = new CodeTime(context.globalState)
+  codetime = new CodeTime(context.globalState, context.secrets)
   vscode.commands.registerCommand('codetime.getToken', () => {
     codetime.setToken()
   })
