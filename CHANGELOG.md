@@ -1,3 +1,12 @@
+## v0.11.1
+
+[v0.11.0...v0.11.1](https://github.com/datreks/codetime-vscode/compare/v0.11.0...v0.11.1)
+
+### :adhesive_bandage: Fixes
+
+- **extension**: correct displayLanguage config handling - By [Jianqi Pan](mailto:jannchie@gmail.com) in [e66f184](https://github.com/datreks/codetime-vscode/commit/e66f184)
+- **i18n**: rename codetime.displayLanguage to codetime.displayLanguage.title in config and translations - By [Jianqi Pan](mailto:jannchie@gmail.com) in [621ae68](https://github.com/datreks/codetime-vscode/commit/621ae68)
+
 ## v0.11.0
 
 [v0.10.0...v0.11.0](https://github.com/datreks/codetime-vscode/compare/v0.10.0...v0.11.0)
