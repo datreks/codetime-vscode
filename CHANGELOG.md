@@ -1,3 +1,15 @@
+## v0.12.0
+
+[v0.11.3...v0.12.0](https://github.com/datreks/codetime-vscode/compare/v0.11.3...v0.12.0)
+
+### :sparkles: Features
+
+- **token**: migrate token storage to secretstorage - By [Jianqi Pan](mailto:jannchie@gmail.com) in [0c62724](https://github.com/datreks/codetime-vscode/commit/0c62724)
+
+### :art: Refactors
+
+- **codetime**: remove unused vars and improve typings - By [Jianqi Pan](mailto:jannchie@gmail.com) in [0c53a5d](https://github.com/datreks/codetime-vscode/commit/0c53a5d)
+
 ## v0.11.3
 
 [v0.11.2...v0.11.3](https://github.com/datreks/codetime-vscode/compare/v0.11.2...v0.11.3)
