@@ -1,3 +1,11 @@
+## v0.11.2
+
+[v0.11.1...v0.11.2](https://github.com/datreks/codetime-vscode/compare/v0.11.1...v0.11.2)
+
+### :adhesive_bandage: Fixes
+
+- **codetime**: log token on input && remove git origin and branch usage && fix displayLanguage access - By [Jianqi Pan](mailto:jannchie@gmail.com) in [67abba5](https://github.com/datreks/codetime-vscode/commit/67abba5)
+
 ## v0.11.1
 
 [v0.11.0...v0.11.1](https://github.com/datreks/codetime-vscode/compare/v0.11.0...v0.11.1)
