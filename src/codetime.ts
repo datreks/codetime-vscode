@@ -4,7 +4,6 @@ import process from 'node:process'
 import { got } from 'got'
 
 import osName from 'os-name'
-import { v4 } from 'uuid'
 import * as vscode from 'vscode'
 import * as events from './events'
 import { getDurationText } from './getDurationText'
@@ -15,9 +14,11 @@ export class CodeTime {
   out: vscode.OutputChannel = vscode.window.createOutputChannel('Codetime')
   private debounceTimer?: NodeJS.Timeout
   private secrets: vscode.SecretStorage
+  private readonly platformVersion = os.release()
+  private readonly platformArch = os.arch()
 
-  private debounce(func: any, wait: number) {
-    return (...args: any) => {
+  private debounce<T extends (...args: any[]) => void>(func: T, wait: number) {
+    return (...args: Parameters<T>) => {
       clearTimeout(this.debounceTimer)
       this.debounceTimer = setTimeout(() => func.apply(this, args), wait)
     }
@@ -50,14 +51,11 @@ export class CodeTime {
   public disposable!: vscode.Disposable
   state: vscode.Memento
   client!: Got
-  userId: number
   token: string = ''
   inter!: NodeJS.Timeout
-  session!: string
   constructor(state: vscode.Memento, secrets: vscode.SecretStorage) {
     this.state = state
     this.secrets = secrets
-    this.userId = this.getUserId()
     this.initSetToken().then(() => {
       this.client = got.extend({
         prefixUrl: vscode.workspace.getConfiguration('codetime').serverEntrypoint,
@@ -67,7 +65,7 @@ export class CodeTime {
         },
         hooks: {
           beforeRequest: [
-            (options: any) => {
+            (options: Record<string, any>) => {
               if (options.headers) {
                 options.headers.token = this.token
               }
@@ -75,14 +73,10 @@ export class CodeTime {
           ],
         },
       })
-      this.session = v4()
       this.init()
     })
   }
 
-  getUserId(): number {
-    return 2
-  }
 
   isToken(token: string) {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
@@ -111,7 +105,7 @@ export class CodeTime {
     }
 
     if (this.token === '') {
-      this.setToken()
+      await this.setToken()
     }
   }
 
@@ -196,8 +190,6 @@ export class CodeTime {
     this.onChange(events.FILE_SAVED)
   }
 
-  platfromVersion = os.release()
-  platfromArch = os.arch()
 
   private getOperationType(eventName = 'unknown'): 'read' | 'write' {
     switch (eventName) {
@@ -221,9 +213,9 @@ export class CodeTime {
     if (workspaceRoot && editor) {
       const doc = editor.document
       if (doc) {
-        const lang: string = doc.languageId
+        const lang = doc.languageId
         const absoluteFilePath = doc.fileName
-        let relativeFilePath: string = vscode.workspace.asRelativePath(
+        let relativeFilePath = vscode.workspace.asRelativePath(
           absoluteFilePath,
         )
         if (relativeFilePath === absoluteFilePath) {
@@ -231,7 +223,7 @@ export class CodeTime {
         }
 
         if (relativeFilePath) {
-          const time: number = Date.now()
+          const time = Date.now()
           const origin = getGitOriginUrl()
           const branch = getGitCurrentBranch()
           const data = {
@@ -243,15 +235,14 @@ export class CodeTime {
             platform: this.osName,
             eventTime: time,
             eventType: eventName,
-            platformArch: this.platfromArch,
-            plugin: 'VSCode',
+            platformArch: this.platformArch,
             gitOrigin: origin,
             gitBranch: branch,
             operationType: this.getOperationType(eventName),
           }
           this.out.appendLine(JSON.stringify({ ...data, token: undefined }))
           // Post data
-          this.client.post(`eventLog`, { json: data }).catch((error: { response: { statusCode: number } }) => {
+          this.client.post(`eventLog`, { json: data }).catch((error: any) => {
             if (error.response?.statusCode === 401) {
               this.out.appendLine('Token authentication failed')
               this.token = ''
@@ -271,14 +262,15 @@ export class CodeTime {
   }
 
   private getCurrentDuration(showSuccess = false) {
-    const key = vscode.workspace.getConfiguration('codetime').statusBarInfo
+    const config = vscode.workspace.getConfiguration('codetime')
+    const key = config.statusBarInfo
     if (this.token === '' || !this.isToken(this.token)) {
       this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Without Token')}`
       this.statusBar.tooltip = vscode.l10n.t('Enter Token')
       this.statusBar.command = 'codetime.getToken'
       return
     }
-    let currentLanguage = vscode.workspace.getConfiguration('codetime').displayLanguage.title
+    let currentLanguage = config.displayLanguage.title
     if (currentLanguage === 'Auto') {
       currentLanguage = vscode.env.language
     }
