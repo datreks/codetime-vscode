@@ -30,7 +30,6 @@ export class CodeTime {
       })
       .then((token) => {
         if (token) {
-          console.log(token)
           this.state.update('token', token)
           this.token = token
           this.getCurrentDuration(true)
@@ -216,10 +215,8 @@ export class CodeTime {
 
         if (relativeFilePath) {
           const time: number = Date.now()
-          // const origin = getGitOriginUrl()
-          const origin = ''
-          // const branch = getGitCurrentBranch()
-          const branch = ''
+          const origin = getGitOriginUrl()
+          const branch = getGitCurrentBranch()
           const data = {
             project: workspaceName,
             language: lang,
