@@ -53,8 +53,8 @@ let codetime: CodeTime
 export async function activate(context: vscode.ExtensionContext) {
   // 读取 displayLanguage 配置
   const config = vscode.workspace.getConfiguration('codetime')
-  const displayLanguage = config.get<string>('displayLanguage', 'Auto')
-  let language = displayLanguage === 'Auto' ? vscode.env.language : displayLanguage
+  const displayLanguage = config.get('displayLanguage', { title: 'Auto' })
+  let language = displayLanguage.title === 'Auto' ? (vscode.env.language ?? '') : displayLanguage.title
   // 统一小写
   language = language.toLowerCase()
   // 动态加载本地化资源
