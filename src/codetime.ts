@@ -29,7 +29,8 @@ export class CodeTime {
         placeHolder: vscode.l10n.t('CodeTime: Input Your Token (from: codetime.dev)'),
       })
       .then((token) => {
-        if (token && this.isToken(token)) {
+        if (token) {
+          console.log(token)
           this.state.update('token', token)
           this.token = token
           this.getCurrentDuration(true)
@@ -215,8 +216,10 @@ export class CodeTime {
 
         if (relativeFilePath) {
           const time: number = Date.now()
-          const origin = getGitOriginUrl()
-          const branch = getGitCurrentBranch()
+          // const origin = getGitOriginUrl()
+          const origin = ''
+          // const branch = getGitCurrentBranch()
+          const branch = ''
           const data = {
             project: workspaceName,
             language: lang,
@@ -251,7 +254,7 @@ export class CodeTime {
       this.statusBar.command = 'codetime.getToken'
       return
     }
-    let currentLanguage = vscode.workspace.getConfiguration('codetime').displayLanguage
+    let currentLanguage = vscode.workspace.getConfiguration('codetime').displayLanguage.title
     if (currentLanguage === 'Auto') {
       currentLanguage = vscode.env.language
     }
