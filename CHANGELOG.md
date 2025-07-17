@@ -1,3 +1,11 @@
+## v0.12.1
+
+[v0.12.0...v0.12.1](https://github.com/datreks/codetime-vscode/compare/v0.12.0...v0.12.1)
+
+### :art: Refactors
+
+- **codetime**: remove token format validation - By [Jianqi Pan](mailto:jannchie@gmail.com) in [fc03c26](https://github.com/datreks/codetime-vscode/commit/fc03c26)
+
 ## v0.12.0
 
 [v0.11.3...v0.12.0](https://github.com/datreks/codetime-vscode/compare/v0.11.3...v0.12.0)
