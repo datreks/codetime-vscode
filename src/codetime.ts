@@ -30,7 +30,7 @@ export class CodeTime {
       placeHolder: vscode.l10n.t('CodeTime: Input Your Token (from: codetime.dev)'),
     })
 
-    if (token && this.isToken(token)) {
+    if (token) {
       await this.secrets.store('codetime.token', token)
       this.token = token
       this.getCurrentDuration(true)
@@ -77,27 +77,20 @@ export class CodeTime {
     })
   }
 
-
-  isToken(token: string) {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      token,
-    )
-  }
-
   async initSetToken() {
     const secretToken = await this.secrets.get('codetime.token')
     const envToken = process.env.CODETIME_TOKEN
 
-    if (secretToken && this.isToken(secretToken)) {
+    if (secretToken) {
       this.token = secretToken
     }
-    else if (envToken && this.isToken(envToken)) {
+    else if (envToken) {
       this.token = envToken
       await this.secrets.store('codetime.token', envToken)
     }
     else {
       const stateToken = this.state.get<string>('token')
-      if (stateToken && this.isToken(stateToken)) {
+      if (stateToken) {
         this.token = stateToken
         await this.secrets.store('codetime.token', stateToken)
         this.state.update('token', undefined)
@@ -190,7 +183,6 @@ export class CodeTime {
     this.onChange(events.FILE_SAVED)
   }
 
-
   private getOperationType(eventName = 'unknown'): 'read' | 'write' {
     switch (eventName) {
       case events.FILE_CREATED:
@@ -264,7 +256,7 @@ export class CodeTime {
   private getCurrentDuration(showSuccess = false) {
     const config = vscode.workspace.getConfiguration('codetime')
     const key = config.statusBarInfo
-    if (this.token === '' || !this.isToken(this.token)) {
+    if (this.token === '') {
       this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Without Token')}`
       this.statusBar.tooltip = vscode.l10n.t('Enter Token')
       this.statusBar.command = 'codetime.getToken'
