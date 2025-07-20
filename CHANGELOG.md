@@ -1,3 +1,11 @@
+## v0.12.2
+
+[v0.12.1...v0.12.2](https://github.com/datreks/codetime-vscode/compare/v0.12.1...v0.12.2)
+
+### :adhesive_bandage: Fixes
+
+- **auth**: preserve token on 401 error - By [Jannchie](mailto:jannchie@gmail.com) in [c2740a1](https://github.com/datreks/codetime-vscode/commit/c2740a1)
+
 ## v0.12.1
 
 [v0.12.0...v0.12.1](https://github.com/datreks/codetime-vscode/compare/v0.12.0...v0.12.1)
