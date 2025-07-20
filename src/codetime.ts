@@ -237,8 +237,6 @@ export class CodeTime {
           this.client.post(`eventLog`, { json: data }).catch((error: any) => {
             if (error.response?.statusCode === 401) {
               this.out.appendLine('Token authentication failed')
-              this.token = ''
-              this.secrets.delete('codetime.token')
               this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Token Invalid')}`
               this.statusBar.tooltip = vscode.l10n.t('Enter Token')
               this.statusBar.command = 'codetime.getToken'
@@ -280,8 +278,6 @@ export class CodeTime {
       this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Token Invalid')}`
       this.statusBar.tooltip = vscode.l10n.t('Enter Token')
       this.statusBar.command = 'codetime.getToken'
-      this.token = ''
-      this.secrets.delete('codetime.token')
     })
   }
 
