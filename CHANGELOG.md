@@ -1,3 +1,11 @@
+## v0.13.0
+
+[v0.12.2...v0.13.0](https://github.com/datreks/codetime-vscode/compare/v0.12.2...v0.13.0)
+
+### :sparkles: Features
+
+- **auth**: add token auth retry with handling - By [Jannchie](mailto:jannchie@gmail.com) in [d9e31a2](https://github.com/datreks/codetime-vscode/commit/d9e31a2)
+
 ## v0.12.2
 
 [v0.12.1...v0.12.2](https://github.com/datreks/codetime-vscode/compare/v0.12.1...v0.12.2)
