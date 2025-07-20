@@ -16,6 +16,8 @@ export class CodeTime {
   private secrets: vscode.SecretStorage
   private readonly platformVersion = os.release()
   private readonly platformArch = os.arch()
+  private authRetryCount = 0
+  private readonly maxAuthRetries = 3
 
   private debounce<T extends (...args: any[]) => void>(func: T, wait: number) {
     return (...args: Parameters<T>) => {
@@ -34,13 +36,6 @@ export class CodeTime {
       await this.secrets.store('codetime.token', token)
       this.token = token
       this.getCurrentDuration(true)
-    }
-    else {
-      vscode.window.showErrorMessage(vscode.l10n.t('CodeTime: Token validation failed'))
-      this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Cannot Get Token')}`
-      this.statusBar.tooltip = vscode.l10n.t('Enter Token')
-      this.statusBar.command = 'codetime.getToken'
-      this.token = ''
     }
   }
 
@@ -236,10 +231,7 @@ export class CodeTime {
           // Post data
           this.client.post(`eventLog`, { json: data }).catch((error: any) => {
             if (error.response?.statusCode === 401) {
-              this.out.appendLine('Token authentication failed')
-              this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Token Invalid')}`
-              this.statusBar.tooltip = vscode.l10n.t('Enter Token')
-              this.statusBar.command = 'codetime.getToken'
+              this.handleAuthError()
             }
             else {
               this.out.appendLine(`Error: ${error}`)
@@ -249,6 +241,32 @@ export class CodeTime {
         }
       }
     }
+  }
+
+  private handleAuthError() {
+    this.authRetryCount++
+
+    if (this.authRetryCount <= this.maxAuthRetries) {
+      this.out.appendLine(`Authentication failed, retry ${this.authRetryCount}/${this.maxAuthRetries}`)
+      this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Auth Retry')} (${this.authRetryCount}/${this.maxAuthRetries})`
+      this.statusBar.tooltip = vscode.l10n.t('CodeTime: Authentication retry, please wait...')
+      this.statusBar.command = 'codetime.toDashboard'
+    }
+    else {
+      this.out.appendLine('Max authentication retries exceeded, token invalid')
+      this.handleTokenInvalid()
+    }
+  }
+
+  private handleTokenInvalid() {
+    this.authRetryCount = 0
+    this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Token Invalid')}`
+    this.statusBar.tooltip = vscode.l10n.t('Enter Token')
+    this.statusBar.command = 'codetime.getToken'
+  }
+
+  private resetAuthRetryCount() {
+    this.authRetryCount = 0
   }
 
   private getCurrentDuration(showSuccess = false) {
@@ -270,14 +288,20 @@ export class CodeTime {
     this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then(async (res: { body: { minutes: any } }) => {
       const { minutes } = res.body
       this.statusBar.text = `$(watch) ${await getDurationText(minutes, currentLanguage)}`
+      this.resetAuthRetryCount()
       if (showSuccess) {
         vscode.window.showInformationMessage(vscode.l10n.t('CodeTime: Token validation succeeded'))
       }
     }).catch((error) => {
-      this.out.appendLine(`Token validation failed: ${error.message || error}`)
-      this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Token Invalid')}`
-      this.statusBar.tooltip = vscode.l10n.t('Enter Token')
-      this.statusBar.command = 'codetime.getToken'
+      if (error.response?.statusCode === 401) {
+        this.handleAuthError()
+      }
+      else {
+        this.out.appendLine(`Network error: ${error.message || error}`)
+        this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Network Error')}`
+        this.statusBar.tooltip = vscode.l10n.t('CodeTime: Network connection failed')
+        this.statusBar.command = 'codetime.toDashboard'
+      }
     })
   }
 

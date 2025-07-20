@@ -68,7 +68,7 @@ Supported options are:
 插件开发者可通过如下方式获取本地化文本：
 
 ```ts
-const text = getLocalizedString(key);
+const text = getLocalizedString(key)
 ```
 
 其中 `key` 为本地化字符串的标识。该方法会根据当前 displayLanguage 返回对应语言的文本。
