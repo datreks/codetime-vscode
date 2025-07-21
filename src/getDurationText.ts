@@ -1,18 +1,18 @@
 import { formatDuration } from 'date-fns'
 
 const localeMap: Record<string, () => Promise<any>> = {
-  'en-US': () => import('date-fns/locale/en-US').then(m => m.default),
-  'zh-CN': () => import('date-fns/locale/zh-CN').then(m => m.default),
-  'zh-TW': () => import('date-fns/locale/zh-TW').then(m => m.default),
-  'ja': () => import('date-fns/locale/ja').then(m => m.default),
-  'de': () => import('date-fns/locale/de').then(m => m.default),
-  'fr': () => import('date-fns/locale/fr').then(m => m.default),
-  'es': () => import('date-fns/locale/es').then(m => m.default),
-  'it': () => import('date-fns/locale/it').then(m => m.default),
-  'pt-BR': () => import('date-fns/locale/pt-BR').then(m => m.default),
-  'ru': () => import('date-fns/locale/ru').then(m => m.default),
-  'ko': () => import('date-fns/locale/ko').then(m => m.default),
-  'hi': () => import('date-fns/locale/hi').then(m => m.default),
+  'en-US': () => import('date-fns/locale/en-US'),
+  'zh-CN': () => import('date-fns/locale/zh-CN'),
+  'zh-TW': () => import('date-fns/locale/zh-TW'),
+  'ja': () => import('date-fns/locale/ja'),
+  'de': () => import('date-fns/locale/de'),
+  'fr': () => import('date-fns/locale/fr'),
+  'es': () => import('date-fns/locale/es'),
+  'it': () => import('date-fns/locale/it'),
+  'pt-BR': () => import('date-fns/locale/pt-BR'),
+  'ru': () => import('date-fns/locale/ru'),
+  'ko': () => import('date-fns/locale/ko'),
+  'hi': () => import('date-fns/locale/hi'),
 }
 
 async function getLocale(locale: string = 'en') {

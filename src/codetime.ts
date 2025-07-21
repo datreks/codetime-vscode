@@ -1,7 +1,6 @@
-import type { Got } from 'got'
 import * as os from 'node:os'
 import process from 'node:process'
-import { got } from 'got'
+import got from 'got'
 
 import osName from 'os-name'
 import * as vscode from 'vscode'
@@ -44,29 +43,14 @@ export class CodeTime {
 
   public disposable!: vscode.Disposable
   state: vscode.Memento
-  client!: Got
+  client!: any
   token: string = ''
   inter!: NodeJS.Timeout
   constructor(state: vscode.Memento, secrets: vscode.SecretStorage) {
     this.state = state
     this.secrets = secrets
     this.initSetToken().then(() => {
-      this.client = got.extend({
-        prefixUrl: vscode.workspace.getConfiguration('codetime').serverEntrypoint,
-        responseType: 'json',
-        headers: {
-          'User-Agent': 'CodeTime Client',
-        },
-        hooks: {
-          beforeRequest: [
-            (options: Record<string, any>) => {
-              if (options.headers) {
-                options.headers.Authorization = `Bearer ${this.token}`
-              }
-            },
-          ],
-        },
-      })
+      this.client = got
       this.init()
     })
   }
@@ -228,7 +212,13 @@ export class CodeTime {
           }
           this.out.appendLine(JSON.stringify({ ...data, token: undefined }))
           // Post data
-          this.client.post(`v3/users/event-log`, { json: data }).catch((error: any) => {
+          this.client.post(`${vscode.workspace.getConfiguration('codetime').serverEntrypoint}/v3/users/event-log`, { 
+            json: data,
+            headers: {
+              'User-Agent': 'CodeTime Client',
+              'Authorization': `Bearer ${this.token}`
+            }
+          }).catch((error: any) => {
             if (error.response?.statusCode === 401) {
               this.handleAuthError()
             }
@@ -284,14 +274,20 @@ export class CodeTime {
     this.statusBar.command = 'codetime.toDashboard'
     this.statusBar.tooltip = vscode.l10n.t('CodeTime: Head to the dashboard for statistics')
     const minutes = getMinutes(key)
-    this.client.get<{ minutes: number }>(`v3/users/self/minutes?minutes=${minutes}`).then(async (res: { body: { minutes: any } }) => {
-      const { minutes } = res.body
+    this.client.get(`${vscode.workspace.getConfiguration('codetime').serverEntrypoint}/v3/users/self/minutes?minutes=${minutes}`, {
+      headers: {
+        'User-Agent': 'CodeTime Client',
+        'Authorization': `Bearer ${this.token}`
+      }
+    }).then(async (res: any) => {
+      const data = JSON.parse(res.body)
+      const { minutes } = data
       this.statusBar.text = `$(watch) ${await getDurationText(minutes, currentLanguage)}`
       this.resetAuthRetryCount()
       if (showSuccess) {
         vscode.window.showInformationMessage(vscode.l10n.t('CodeTime: Token validation succeeded'))
       }
-    }).catch((error) => {
+    }).catch((error: any) => {
       if (error.response?.statusCode === 401) {
         this.handleAuthError()
       }
