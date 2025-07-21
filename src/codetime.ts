@@ -212,12 +212,19 @@ export class CodeTime {
           }
           this.out.appendLine(JSON.stringify({ ...data, token: undefined }))
           // Post data
-          this.client.post(`${vscode.workspace.getConfiguration('codetime').serverEntrypoint}/v3/users/event-log`, { 
+          if (this.token === '') {
+            this.out.appendLine('Token is empty, cannot send event data')
+            this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Without Token')}`
+            this.statusBar.tooltip = vscode.l10n.t('Enter Token')
+            this.statusBar.command = 'codetime.getToken'
+            return
+          }
+          this.client.post(`${vscode.workspace.getConfiguration('codetime').serverEntrypoint}/v3/users/event-log`, {
             json: data,
             headers: {
               'User-Agent': 'CodeTime Client',
-              'Authorization': `Bearer ${this.token}`
-            }
+              'Authorization': `Bearer ${this.token}`,
+            },
           }).catch((error: any) => {
             if (error.response?.statusCode === 401) {
               this.handleAuthError()
@@ -236,10 +243,10 @@ export class CodeTime {
     this.authRetryCount++
 
     if (this.authRetryCount <= this.maxAuthRetries) {
-      this.out.appendLine(`Authentication failed, retry ${this.authRetryCount}/${this.maxAuthRetries}`)
-      this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Auth Retry')} (${this.authRetryCount}/${this.maxAuthRetries})`
+      this.out.appendLine(`Authentication failed, retrying (${this.authRetryCount}/${this.maxAuthRetries})...`)
+      this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Auth Failed')}`
       this.statusBar.tooltip = vscode.l10n.t('CodeTime: Authentication retry, please wait...')
-      this.statusBar.command = 'codetime.toDashboard'
+      this.statusBar.command = 'codetime.getToken'
     }
     else {
       this.out.appendLine('Max authentication retries exceeded, token invalid')
@@ -277,12 +284,14 @@ export class CodeTime {
     this.client.get(`${vscode.workspace.getConfiguration('codetime').serverEntrypoint}/v3/users/self/minutes?minutes=${minutes}`, {
       headers: {
         'User-Agent': 'CodeTime Client',
-        'Authorization': `Bearer ${this.token}`
-      }
+        'Authorization': `Bearer ${this.token}`,
+      },
     }).then(async (res: any) => {
       const data = JSON.parse(res.body)
       const { minutes } = data
+      this.out.appendLine(`Current duration: ${minutes} minutes`)
       this.statusBar.text = `$(watch) ${await getDurationText(minutes, currentLanguage)}`
+      this.out.appendLine(await getDurationText(minutes, currentLanguage))
       this.resetAuthRetryCount()
       if (showSuccess) {
         vscode.window.showInformationMessage(vscode.l10n.t('CodeTime: Token validation succeeded'))

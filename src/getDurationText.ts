@@ -17,7 +17,8 @@ const localeMap: Record<string, () => Promise<any>> = {
 
 async function getLocale(locale: string = 'en') {
   const key = Object.keys(localeMap).find(k => k.toLowerCase() === locale.toLowerCase()) || 'en-US'
-  return await localeMap[key]()
+  const localeModule = await localeMap[key]()
+  return localeModule.default || localeModule
 }
 
 /**
@@ -30,9 +31,10 @@ export async function getDurationText(minutes: number, locale: string = 'en'): P
   const hours = Math.floor(minutes / 60)
   const mins = minutes % 60
   const l = await getLocale(locale)
+
   const text = formatDuration(
     { hours, minutes: mins },
     { locale: l, format: ['hours', 'minutes'], zero: false },
   )
-  return text || formatDuration({ minutes: 0 }, { locale: l, format: ['minutes'] })
+  return text
 }
