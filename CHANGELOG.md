@@ -1,3 +1,11 @@
+## v0.13.2
+
+[v0.13.1...v0.13.2](https://github.com/datreks/codetime-vscode/compare/v0.13.1...v0.13.2)
+
+### :adhesive_bandage: Fixes
+
+- **codetime**: update auth header and api endpoints - By [Jannchie](mailto:jannchie@gmail.com) in [3301135](https://github.com/datreks/codetime-vscode/commit/3301135)
+
 ## v0.13.1
 
 [v0.13.0...v0.13.1](https://github.com/datreks/codetime-vscode/compare/v0.13.0...v0.13.1)
