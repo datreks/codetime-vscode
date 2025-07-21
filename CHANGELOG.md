@@ -1,3 +1,11 @@
+## v0.13.1
+
+[v0.13.0...v0.13.1](https://github.com/datreks/codetime-vscode/compare/v0.13.0...v0.13.1)
+
+### :art: Refactors
+
+- **codetime**: remove unused platformVersion && use vscode env appName for editor - By [Jannchie](mailto:jannchie@gmail.com) in [ba46f6c](https://github.com/datreks/codetime-vscode/commit/ba46f6c)
+
 ## v0.13.0
 
 [v0.12.2...v0.13.0](https://github.com/datreks/codetime-vscode/compare/v0.12.2...v0.13.0)
