@@ -1,3 +1,16 @@
+## v0.13.3
+
+[v0.13.2...v0.13.3](https://github.com/datreks/codetime-vscode/compare/v0.13.2...v0.13.3)
+
+### :adhesive_bandage: Fixes
+
+- **codetime**: handle empty token and improve status bar messages - By [Jannchie](mailto:jannchie@gmail.com) in [a0c580f](https://github.com/datreks/codetime-vscode/commit/a0c580f)
+- **dependencies**: upgrade got and date-fns and update their usage - By [Jannchie](mailto:jannchie@gmail.com) in [8a88800](https://github.com/datreks/codetime-vscode/commit/8a88800)
+
+### :memo: Documentation
+
+- **readme**: rewrite language option section in english - By [Jannchie](mailto:jannchie@gmail.com) in [3b0d11a](https://github.com/datreks/codetime-vscode/commit/3b0d11a)
+
 ## v0.13.2
 
 [v0.13.1...v0.13.2](https://github.com/datreks/codetime-vscode/compare/v0.13.1...v0.13.2)
