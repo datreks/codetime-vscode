@@ -14,7 +14,6 @@ export class CodeTime {
   out: vscode.OutputChannel = vscode.window.createOutputChannel('Codetime')
   private debounceTimer?: NodeJS.Timeout
   private secrets: vscode.SecretStorage
-  private readonly platformVersion = os.release()
   private readonly platformArch = os.arch()
   private authRetryCount = 0
   private readonly maxAuthRetries = 3
@@ -218,7 +217,7 @@ export class CodeTime {
             language: lang,
             relativeFile: relativeFilePath,
             absoluteFile: absoluteFilePath,
-            editor: 'VSCode',
+            editor: vscode.env.appName,
             platform: this.osName,
             eventTime: time,
             eventType: eventName,
