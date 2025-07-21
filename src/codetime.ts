@@ -61,7 +61,7 @@ export class CodeTime {
           beforeRequest: [
             (options: Record<string, any>) => {
               if (options.headers) {
-                options.headers.token = this.token
+                options.headers.Authorization = `Bearer ${this.token}`
               }
             },
           ],
@@ -228,7 +228,7 @@ export class CodeTime {
           }
           this.out.appendLine(JSON.stringify({ ...data, token: undefined }))
           // Post data
-          this.client.post(`eventLog`, { json: data }).catch((error: any) => {
+          this.client.post(`v3/users/event-log`, { json: data }).catch((error: any) => {
             if (error.response?.statusCode === 401) {
               this.handleAuthError()
             }
@@ -284,7 +284,7 @@ export class CodeTime {
     this.statusBar.command = 'codetime.toDashboard'
     this.statusBar.tooltip = vscode.l10n.t('CodeTime: Head to the dashboard for statistics')
     const minutes = getMinutes(key)
-    this.client.get<{ minutes: number }>(`user/minutes?minutes=${minutes}`).then(async (res: { body: { minutes: any } }) => {
+    this.client.get<{ minutes: number }>(`v3/users/self/minutes?minutes=${minutes}`).then(async (res: { body: { minutes: any } }) => {
       const { minutes } = res.body
       this.statusBar.text = `$(watch) ${await getDurationText(minutes, currentLanguage)}`
       this.resetAuthRetryCount()
