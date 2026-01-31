@@ -24,5 +24,6 @@
   "codetime.displayLanguage.enum.ko": "Koreanisch",
   "codetime.displayLanguage.enum.hi": "Hindi",
   "codetime.displayLanguage.enum.zh-tw": "Chinesisch (traditionell)",
+  "codetime.displayLanguage.enum.ur": "Urdu",
   "codetime.displayLanguage.enum.auto": "Automatisch (entspricht der VSCode-Sprache)"
 }

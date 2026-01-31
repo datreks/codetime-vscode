@@ -24,5 +24,6 @@
   "codetime.displayLanguage.enum.ko": "कोरियाई",
   "codetime.displayLanguage.enum.hi": "हिंदी",
   "codetime.displayLanguage.enum.zh-tw": "चीनी (परंपरागत)",
+  "codetime.displayLanguage.enum.ur": "उर्दू",
   "codetime.displayLanguage.enum.auto": "स्वचालित (VSCode भाषा के अनुसार)"
 }

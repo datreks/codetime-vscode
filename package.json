@@ -84,7 +84,8 @@
             "ru",
             "ko",
             "hi",
-            "zh-TW"
+            "zh-TW",
+            "ur"
           ],
           "enumDescriptions": [
             "%codetime.displayLanguage.enum.auto%",
@@ -99,7 +100,8 @@
             "%codetime.displayLanguage.enum.ru%",
             "%codetime.displayLanguage.enum.ko%",
             "%codetime.displayLanguage.enum.hi%",
-            "%codetime.displayLanguage.enum.zh-tw%"
+            "%codetime.displayLanguage.enum.zh-tw%",
+            "%codetime.displayLanguage.enum.ur%"
           ],
           "title": "%codetime.displayLanguage.title%",
           "description": "%codetime.displayLanguage.description%"

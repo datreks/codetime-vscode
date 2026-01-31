@@ -57,6 +57,7 @@ The `displayLanguage` option is used to switch the display language of the plugi
 - `ko`: 한국어 (Korean)
 - `pt-br`: Português (Brasil) (Portuguese-Brazil)
 - `ru`: Русский (Russian)
+- `ur`: اردو (Urdu)
 
 #### How to Switch
 
