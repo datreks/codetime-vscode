@@ -24,5 +24,6 @@
   "codetime.displayLanguage.enum.ko": "한국어",
   "codetime.displayLanguage.enum.hi": "힌디어",
   "codetime.displayLanguage.enum.zh-tw": "중국어(번체)",
+  "codetime.displayLanguage.enum.ur": "우르두어",
   "codetime.displayLanguage.enum.auto": "자동(VSCode 언어 따름)"
 }
