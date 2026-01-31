@@ -1,3 +1,11 @@
+## v0.13.4
+
+[v0.13.3...v0.13.4](https://github.com/datreks/codetime-vscode/compare/v0.13.3...v0.13.4)
+
+### :sparkles: Features
+
+- **i18n**: add urdu locale - By [Ayaan](mailto:iamayaanalee@gmail.com) in [43929fa](https://github.com/datreks/codetime-vscode/commit/43929fa)
+
 ## v0.13.3
 
 [v0.13.2...v0.13.3](https://github.com/datreks/codetime-vscode/compare/v0.13.2...v0.13.3)
