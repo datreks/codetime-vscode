@@ -1,8 +1,9 @@
-import * as os from 'node:os'
-import process from 'node:process'
+import { Buffer } from 'node:buffer'
 import http from 'node:http'
 import https from 'node:https'
 import net from 'node:net'
+import * as os from 'node:os'
+import process from 'node:process'
 import tls from 'node:tls'
 
 import osName from 'os-name'
@@ -46,141 +47,196 @@ export class CodeTime {
 
   public disposable!: vscode.Disposable
   state: vscode.Memento
-  private proxyUrl: string = ''
   token: string = ''
   inter!: NodeJS.Timeout
   constructor(state: vscode.Memento, secrets: vscode.SecretStorage) {
     this.state = state
     this.secrets = secrets
     this.initSetToken().then(() => {
-      const configProxy = vscode.workspace.getConfiguration('codetime').get<string>('proxy')
-      this.proxyUrl = configProxy
-        || process.env.HTTPS_PROXY || process.env.HTTP_PROXY
-        || process.env.https_proxy || process.env.http_proxy
-        || ''
       this.init()
     })
   }
 
-  private apiRequest(method: string, path: string, body?: any): Promise<any> {
+  private getProxyUrl(): string {
+    return (
+      vscode.workspace.getConfiguration('codetime').get<string>('proxy')
+      || process.env.HTTPS_PROXY || process.env.HTTP_PROXY
+      || process.env.https_proxy || process.env.http_proxy
+      || ''
+    )
+  }
+
+  private apiRequest(method: string, path: string, body?: any): Promise<{ body: string, statusCode: number }> {
     const serverUrl = vscode.workspace.getConfiguration('codetime').serverEntrypoint as string
     const url = new URL(path, serverUrl)
     const payload = body ? JSON.stringify(body) : undefined
-    const proxy = this.proxyUrl
+    const proxy = this.getProxyUrl()
+    const isHttpsTarget = url.protocol === 'https:'
+    const targetPort = Number(url.port) || (isHttpsTarget ? 443 : 80)
+
+    const baseHeaders: Record<string, string> = {
+      'User-Agent': 'CodeTime Client',
+      'Authorization': `Bearer ${this.token}`,
+    }
+    if (payload) {
+      baseHeaders['Content-Type'] = 'application/json'
+      baseHeaders['Content-Length'] = Buffer.byteLength(payload).toString()
+    }
 
     return new Promise((resolve, reject) => {
       const startTime = Date.now()
       this.out.appendLine(`[Req] ${method} ${path} proxy=${proxy || 'none'}`)
 
-      const doRequest = (tlsSocket?: tls.TLSSocket) => {
-        if (tlsSocket) {
-          const lines = [
-            `${method} ${url.pathname + url.search} HTTP/1.1`,
-            `Host: ${url.hostname}`,
-            `User-Agent: CodeTime Client`,
-            `Authorization: Bearer ${this.token}`,
-            `Connection: close`,
-            ...(payload ? [`Content-Type: application/json`, `Content-Length: ${Buffer.byteLength(payload)}`] : []),
-            ``,
-            payload || ``,
-          ]
-          tlsSocket.write(lines.join('\r\n'))
-          let raw = ''
-          tlsSocket.on('data', (chunk: Buffer) => { raw += chunk.toString() })
-          tlsSocket.on('end', () => {
-            tlsSocket.destroy()
-            const headerEnd = raw.indexOf('\r\n\r\n')
-            const statusLine = raw.split('\r\n')[0]
-            const statusCode = Number(statusLine.split(' ')[1])
-            const body = headerEnd >= 0 ? raw.slice(headerEnd + 4) : ''
-            this.out.appendLine(`[Req] ${statusCode} after ${Date.now() - startTime}ms`)
-            if (statusCode === 401) {
-              reject({ response: { statusCode: 401 } })
-            }
-            else {
-              resolve({ body, statusCode })
-            }
-          })
-          tlsSocket.on('error', (e: any) => {
-            this.out.appendLine(`[Req] socket error: ${e.message}`)
-            reject(e)
-          })
+      const finish = (parsed: { statusCode: number, body: string }) => {
+        this.out.appendLine(`[Req] ${parsed.statusCode} after ${Date.now() - startTime}ms`)
+        if (parsed.statusCode === 401) {
+          const err = new Error('Unauthorized') as Error & { response: { statusCode: number } }
+          err.response = { statusCode: 401 }
+          reject(err)
           return
         }
+        resolve(parsed)
+      }
 
-        const req = https.request({
+      // No proxy: use Node's http(s) client directly
+      if (!proxy) {
+        const lib = isHttpsTarget ? https : http
+        const req = lib.request({
           method,
           hostname: url.hostname,
-          port: 443,
+          port: targetPort,
           path: url.pathname + url.search,
-          timeout: 30000,
-          headers: {
-            'User-Agent': 'CodeTime Client',
-            'Authorization': `Bearer ${this.token}`,
-            ...(payload ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload).toString() } : {}),
-          },
-        }, handleResponse)
+          timeout: 30_000,
+          headers: baseHeaders,
+        }, (res: http.IncomingMessage) => {
+          const chunks: Buffer[] = []
+          res.on('data', (chunk: Buffer) => chunks.push(chunk))
+          res.on('end', () => {
+            finish({
+              statusCode: res.statusCode ?? 0,
+              body: Buffer.concat(chunks).toString('utf8'),
+            })
+          })
+        })
         req.on('error', (e: any) => {
           this.out.appendLine(`[Req] error after ${Date.now() - startTime}ms: ${e.message}`)
           reject(e)
         })
-        if (payload) req.write(payload)
+        req.on('timeout', () => req.destroy(new Error('request timeout')))
+        if (payload) {
+          req.write(payload)
+        }
         req.end()
-      }
-
-      const handleResponse = (res: http.IncomingMessage) => {
-        this.out.appendLine(`[Req] ${res.statusCode} after ${Date.now() - startTime}ms`)
-        let data = ''
-        res.on('data', (chunk: string) => { data += chunk })
-        res.on('end', () => {
-          if (res.statusCode === 401) {
-            reject({ response: { statusCode: 401 } })
-            return
-          }
-          resolve({ body: data, statusCode: res.statusCode })
-        })
-      }
-
-      if (!proxy) {
-        doRequest()
         return
       }
 
-      const proxyUrl = new URL(proxy)
-      const proxyPort = Number(proxyUrl.port) || 80
-      const proxyHost = proxyUrl.hostname
-      this.out.appendLine(`[Req] connecting to proxy ${proxyHost}:${proxyPort}`)
-      const tcpSocket = net.connect(proxyPort, proxyHost, () => {
-        this.out.appendLine(`[Req] proxy TCP connected, sending CONNECT`)
-        tcpSocket.write(`CONNECT ${url.hostname}:443 HTTP/1.1\r\nHost: ${url.hostname}:443\r\nProxy-Connection: keep-alive\r\n\r\n`)
-        let header = ''
-        const onData = (chunk: Buffer) => {
-          header += chunk.toString()
-          if (!header.includes('\r\n\r\n')) return
-          tcpSocket.removeListener('data', onData)
-          this.out.appendLine(`[Req] proxy response: ${header.split('\r\n')[0]}`)
-          if (!header.startsWith('HTTP/1.1 200') && !header.startsWith('HTTP/1.0 200')) {
-            reject(new Error(`Proxy CONNECT failed: ${header.split('\r\n')[0]}`))
-            tcpSocket.destroy()
+      // With proxy: open TCP/TLS to proxy, then CONNECT (HTTPS target) or absolute-form (HTTP target)
+      const proxyUrlParsed = new URL(proxy)
+      const isHttpsProxy = proxyUrlParsed.protocol === 'https:'
+      const proxyPort = Number(proxyUrlParsed.port) || (isHttpsProxy ? 443 : 80)
+      const proxyHost = proxyUrlParsed.hostname
+
+      const proxyAuthHeader = proxyUrlParsed.username
+        ? `Proxy-Authorization: Basic ${Buffer.from(`${decodeURIComponent(proxyUrlParsed.username)}:${decodeURIComponent(proxyUrlParsed.password)}`).toString('base64')}`
+        : ''
+
+      this.out.appendLine(`[Req] connecting to proxy ${proxyHost}:${proxyPort} (${proxyUrlParsed.protocol})`)
+
+      const writeRequestAndRead = (socket: net.Socket | tls.TLSSocket, requestLine: string, extraHeaders: string[] = []) => {
+        const lines = [
+          requestLine,
+          `Host: ${url.host}`,
+          ...Object.entries(baseHeaders).map(([k, v]) => `${k}: ${v}`),
+          ...extraHeaders,
+          'Connection: close',
+          '',
+          payload || '',
+        ]
+        socket.write(lines.join('\r\n'))
+        const chunks: Buffer[] = []
+        socket.on('data', (chunk: Buffer) => chunks.push(chunk))
+        socket.on('end', () => {
+          socket.destroy()
+          try {
+            finish(parseHttpResponse(Buffer.concat(chunks)))
+          }
+          catch (error: any) {
+            this.out.appendLine(`[Req] parse error: ${error.message}`)
+            reject(error)
+          }
+        })
+        socket.on('error', (e: any) => {
+          this.out.appendLine(`[Req] socket error: ${e.message}`)
+          reject(e)
+        })
+      }
+
+      const onProxyReady = (proxySocket: net.Socket | tls.TLSSocket) => {
+        if (!isHttpsTarget) {
+          this.out.appendLine(`[Req] proxy connected, sending HTTP request (absolute form)`)
+          proxySocket.setTimeout(0)
+          writeRequestAndRead(
+            proxySocket,
+            `${method} ${url.toString()} HTTP/1.1`,
+            proxyAuthHeader ? [proxyAuthHeader] : [],
+          )
+          return
+        }
+
+        this.out.appendLine(`[Req] proxy connected, sending CONNECT`)
+        const connectLines = [
+          `CONNECT ${url.hostname}:${targetPort} HTTP/1.1`,
+          `Host: ${url.hostname}:${targetPort}`,
+          ...(proxyAuthHeader ? [proxyAuthHeader] : []),
+          'Proxy-Connection: keep-alive',
+          '',
+          '',
+        ]
+        proxySocket.write(connectLines.join('\r\n'))
+
+        let connectBuf = Buffer.alloc(0)
+        const onConnectData = (chunk: Buffer) => {
+          connectBuf = Buffer.concat([connectBuf, chunk])
+          const idx = connectBuf.indexOf('\r\n\r\n')
+          if (idx === -1) {
             return
           }
-          const tlsSocket = tls.connect({ socket: tcpSocket, servername: url.hostname }, () => {
+          proxySocket.removeListener('data', onConnectData)
+          const headerStr = connectBuf.slice(0, idx).toString('utf8')
+          const statusLine = headerStr.split('\r\n')[0]
+          this.out.appendLine(`[Req] proxy response: ${statusLine}`)
+          const m = statusLine.match(/^HTTP\/\d\.\d (\d{3})/)
+          if (!m || m[1] !== '200') {
+            proxySocket.destroy()
+            reject(new Error(`Proxy CONNECT failed: ${statusLine}`))
+            return
+          }
+          proxySocket.setTimeout(0)
+          const residue = connectBuf.slice(idx + 4)
+          if (residue.length > 0) {
+            proxySocket.unshift(residue)
+          }
+          const tlsSocket = tls.connect({ socket: proxySocket, servername: url.hostname }, () => {
             this.out.appendLine(`[Req] TLS handshake done, sending HTTP request`)
-            doRequest(tlsSocket)
+            writeRequestAndRead(tlsSocket, `${method} ${url.pathname + url.search} HTTP/1.1`)
           })
           tlsSocket.on('error', (e: any) => {
             this.out.appendLine(`[Req] TLS error: ${e.message}`)
             reject(e)
           })
         }
-        tcpSocket.on('data', onData)
-      })
-      tcpSocket.setTimeout(10000, () => {
-        tcpSocket.destroy()
+        proxySocket.on('data', onConnectData)
+      }
+
+      const proxySocket: net.Socket | tls.TLSSocket = isHttpsProxy
+        ? tls.connect({ host: proxyHost, port: proxyPort, servername: proxyHost }, () => onProxyReady(proxySocket))
+        : net.connect(proxyPort, proxyHost, () => onProxyReady(proxySocket))
+      proxySocket.setTimeout(10_000, () => {
+        proxySocket.destroy()
         reject(new Error('Proxy connection timeout'))
       })
-      tcpSocket.on('error', (e: any) => {
-        this.out.appendLine(`[Req] TCP error connecting to proxy: ${e.code} ${e.message}`)
+      proxySocket.on('error', (e: any) => {
+        this.out.appendLine(`[Req] proxy socket error: ${e.code || ''} ${e.message}`)
         reject(e)
       })
     })
@@ -212,11 +268,9 @@ export class CodeTime {
   }
 
   private init(): void {
-    const proxyUrl = vscode.workspace.getConfiguration('codetime').get<string>('proxy')
-      || process.env.HTTPS_PROXY || process.env.HTTP_PROXY || process.env.https_proxy || process.env.http_proxy
-    this.out.appendLine(`[Init] proxy=${proxyUrl || '(none)'}`)
+    this.out.appendLine(`[Init] proxy=${this.getProxyUrl() || '(none)'}`)
     this.out.appendLine(`[Init] serverEntrypoint=${vscode.workspace.getConfiguration('codetime').serverEntrypoint}`)
-    this.out.appendLine(`[Init] token=${this.token ? '***' + this.token.slice(-4) : '(empty)'}`)
+    this.out.appendLine(`[Init] token=${this.token ? `***${this.token.slice(-4)}` : '(empty)'}`)
 
     this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Initializing...')}`
     this.statusBar.show()
@@ -409,10 +463,6 @@ export class CodeTime {
     this.statusBar.command = 'codetime.toDashboard'
     this.statusBar.tooltip = vscode.l10n.t('CodeTime: Head to the dashboard for statistics')
     const minutes = getMinutes(key)
-    const proxyUrl = vscode.workspace.getConfiguration('codetime').get<string>('proxy')
-      || process.env.HTTPS_PROXY || process.env.HTTP_PROXY || process.env.https_proxy || process.env.http_proxy
-    const serverUrl = vscode.workspace.getConfiguration('codetime').serverEntrypoint
-    this.out.appendLine(`[Duration] GET ${serverUrl}/v3/users/self/minutes?minutes=${minutes} proxy=${proxyUrl || '(none)'}`)
     this.apiRequest('GET', `/v3/users/self/minutes?minutes=${minutes}`).then(async (res: any) => {
       const data = JSON.parse(res.body)
       const { minutes } = data
@@ -429,7 +479,9 @@ export class CodeTime {
       }
       else {
         this.out.appendLine(`[Duration] Network error: ${error.message || error}`)
-        if (error.code) this.out.appendLine(`[Duration] Error code: ${error.code}`)
+        if (error.code) {
+          this.out.appendLine(`[Duration] Error code: ${error.code}`)
+        }
         this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Network Error')}`
         this.statusBar.tooltip = vscode.l10n.t('CodeTime: Network connection failed')
         this.statusBar.command = 'codetime.toDashboard'
@@ -474,6 +526,55 @@ export class CodeTime {
     this.disposable.dispose()
     clearInterval(this.inter)
   }
+}
+
+function parseHttpResponse(buf: Buffer): { statusCode: number, body: string } {
+  const headerEnd = buf.indexOf('\r\n\r\n')
+  if (headerEnd === -1) {
+    throw new Error('Incomplete HTTP response (no header terminator)')
+  }
+  const headerText = buf.slice(0, headerEnd).toString('utf8')
+  const lines = headerText.split('\r\n')
+  const statusLine = lines[0] || ''
+  const m = statusLine.match(/^HTTP\/\d\.\d (\d{3})/)
+  if (!m) {
+    throw new Error(`Invalid status line: ${statusLine}`)
+  }
+  const statusCode = Number(m[1])
+  const headers = new Map<string, string>()
+  for (let i = 1; i < lines.length; i++) {
+    const idx = lines[i].indexOf(':')
+    if (idx > 0) {
+      headers.set(lines[i].slice(0, idx).trim().toLowerCase(), lines[i].slice(idx + 1).trim())
+    }
+  }
+  const rawBody = buf.slice(headerEnd + 4)
+  const isChunked = (headers.get('transfer-encoding') || '').toLowerCase().includes('chunked')
+  const bodyBuf = isChunked ? decodeChunked(rawBody) : rawBody
+  return { statusCode, body: bodyBuf.toString('utf8') }
+}
+
+function decodeChunked(buf: Buffer): Buffer {
+  const out: Buffer[] = []
+  let offset = 0
+  while (offset < buf.length) {
+    const sizeLineEnd = buf.indexOf('\r\n', offset)
+    if (sizeLineEnd === -1) {
+      break
+    }
+    const sizeHex = buf.slice(offset, sizeLineEnd).toString('utf8').split(';')[0].trim()
+    const size = Number.parseInt(sizeHex, 16)
+    if (Number.isNaN(size)) {
+      throw new TypeError(`Invalid chunk size: ${sizeHex}`)
+    }
+    if (size === 0) {
+      break
+    }
+    const dataStart = sizeLineEnd + 2
+    out.push(buf.slice(dataStart, dataStart + size))
+    offset = dataStart + size + 2
+  }
+  return Buffer.concat(out)
 }
 
 function getMinutes(key: string) {
