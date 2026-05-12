@@ -10,6 +10,7 @@
   "config.statusBarInfo.enum.today": "Show today code time",
   "config.statusBarInfo.enum.24h": "Show 24h code time",
   "config.serverEntrypoint.description": "Server entrypoint defines the URL for reporting data to a server.",
+  "config.proxy.description": "Proxy URL for API requests, e.g. http://127.0.0.1:8080. Leave empty to use system proxy environment variables (HTTP_PROXY/HTTPS_PROXY).",
   "codetime.displayLanguage.title": "Display Language",
   "codetime.displayLanguage.description": "Select the display language for the CodeTime extension.",
   "codetime.displayLanguage.enum.zh-cn": "Chinese (Simplified)",

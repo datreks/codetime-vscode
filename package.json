@@ -68,6 +68,11 @@
           "default": "https://api.codetime.dev",
           "description": "%config.serverEntrypoint.description%"
         },
+        "codetime.proxy": {
+          "type": "string",
+          "default": "",
+          "description": "%config.proxy.description%"
+        },
         "codetime.displayLanguage.title": {
           "type": "string",
           "default": "Auto",

@@ -1,6 +1,9 @@
 import * as os from 'node:os'
 import process from 'node:process'
-import got from 'got'
+import http from 'node:http'
+import https from 'node:https'
+import net from 'node:net'
+import tls from 'node:tls'
 
 import osName from 'os-name'
 import * as vscode from 'vscode'
@@ -43,15 +46,143 @@ export class CodeTime {
 
   public disposable!: vscode.Disposable
   state: vscode.Memento
-  client!: any
+  private proxyUrl: string = ''
   token: string = ''
   inter!: NodeJS.Timeout
   constructor(state: vscode.Memento, secrets: vscode.SecretStorage) {
     this.state = state
     this.secrets = secrets
     this.initSetToken().then(() => {
-      this.client = got
+      const configProxy = vscode.workspace.getConfiguration('codetime').get<string>('proxy')
+      this.proxyUrl = configProxy
+        || process.env.HTTPS_PROXY || process.env.HTTP_PROXY
+        || process.env.https_proxy || process.env.http_proxy
+        || ''
       this.init()
+    })
+  }
+
+  private apiRequest(method: string, path: string, body?: any): Promise<any> {
+    const serverUrl = vscode.workspace.getConfiguration('codetime').serverEntrypoint as string
+    const url = new URL(path, serverUrl)
+    const payload = body ? JSON.stringify(body) : undefined
+    const proxy = this.proxyUrl
+
+    return new Promise((resolve, reject) => {
+      const startTime = Date.now()
+      this.out.appendLine(`[Req] ${method} ${path} proxy=${proxy || 'none'}`)
+
+      const doRequest = (tlsSocket?: tls.TLSSocket) => {
+        if (tlsSocket) {
+          const lines = [
+            `${method} ${url.pathname + url.search} HTTP/1.1`,
+            `Host: ${url.hostname}`,
+            `User-Agent: CodeTime Client`,
+            `Authorization: Bearer ${this.token}`,
+            `Connection: close`,
+            ...(payload ? [`Content-Type: application/json`, `Content-Length: ${Buffer.byteLength(payload)}`] : []),
+            ``,
+            payload || ``,
+          ]
+          tlsSocket.write(lines.join('\r\n'))
+          let raw = ''
+          tlsSocket.on('data', (chunk: Buffer) => { raw += chunk.toString() })
+          tlsSocket.on('end', () => {
+            tlsSocket.destroy()
+            const headerEnd = raw.indexOf('\r\n\r\n')
+            const statusLine = raw.split('\r\n')[0]
+            const statusCode = Number(statusLine.split(' ')[1])
+            const body = headerEnd >= 0 ? raw.slice(headerEnd + 4) : ''
+            this.out.appendLine(`[Req] ${statusCode} after ${Date.now() - startTime}ms`)
+            if (statusCode === 401) {
+              reject({ response: { statusCode: 401 } })
+            }
+            else {
+              resolve({ body, statusCode })
+            }
+          })
+          tlsSocket.on('error', (e: any) => {
+            this.out.appendLine(`[Req] socket error: ${e.message}`)
+            reject(e)
+          })
+          return
+        }
+
+        const req = https.request({
+          method,
+          hostname: url.hostname,
+          port: 443,
+          path: url.pathname + url.search,
+          timeout: 30000,
+          headers: {
+            'User-Agent': 'CodeTime Client',
+            'Authorization': `Bearer ${this.token}`,
+            ...(payload ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload).toString() } : {}),
+          },
+        }, handleResponse)
+        req.on('error', (e: any) => {
+          this.out.appendLine(`[Req] error after ${Date.now() - startTime}ms: ${e.message}`)
+          reject(e)
+        })
+        if (payload) req.write(payload)
+        req.end()
+      }
+
+      const handleResponse = (res: http.IncomingMessage) => {
+        this.out.appendLine(`[Req] ${res.statusCode} after ${Date.now() - startTime}ms`)
+        let data = ''
+        res.on('data', (chunk: string) => { data += chunk })
+        res.on('end', () => {
+          if (res.statusCode === 401) {
+            reject({ response: { statusCode: 401 } })
+            return
+          }
+          resolve({ body: data, statusCode: res.statusCode })
+        })
+      }
+
+      if (!proxy) {
+        doRequest()
+        return
+      }
+
+      const proxyUrl = new URL(proxy)
+      const proxyPort = Number(proxyUrl.port) || 80
+      const proxyHost = proxyUrl.hostname
+      this.out.appendLine(`[Req] connecting to proxy ${proxyHost}:${proxyPort}`)
+      const tcpSocket = net.connect(proxyPort, proxyHost, () => {
+        this.out.appendLine(`[Req] proxy TCP connected, sending CONNECT`)
+        tcpSocket.write(`CONNECT ${url.hostname}:443 HTTP/1.1\r\nHost: ${url.hostname}:443\r\nProxy-Connection: keep-alive\r\n\r\n`)
+        let header = ''
+        const onData = (chunk: Buffer) => {
+          header += chunk.toString()
+          if (!header.includes('\r\n\r\n')) return
+          tcpSocket.removeListener('data', onData)
+          this.out.appendLine(`[Req] proxy response: ${header.split('\r\n')[0]}`)
+          if (!header.startsWith('HTTP/1.1 200') && !header.startsWith('HTTP/1.0 200')) {
+            reject(new Error(`Proxy CONNECT failed: ${header.split('\r\n')[0]}`))
+            tcpSocket.destroy()
+            return
+          }
+          const tlsSocket = tls.connect({ socket: tcpSocket, servername: url.hostname }, () => {
+            this.out.appendLine(`[Req] TLS handshake done, sending HTTP request`)
+            doRequest(tlsSocket)
+          })
+          tlsSocket.on('error', (e: any) => {
+            this.out.appendLine(`[Req] TLS error: ${e.message}`)
+            reject(e)
+          })
+        }
+        tcpSocket.on('data', onData)
+      })
+      tcpSocket.setTimeout(10000, () => {
+        tcpSocket.destroy()
+        reject(new Error('Proxy connection timeout'))
+      })
+      tcpSocket.on('error', (e: any) => {
+        this.out.appendLine(`[Req] TCP error connecting to proxy: ${e.code} ${e.message}`)
+        reject(e)
+      })
     })
   }
 
@@ -81,14 +212,18 @@ export class CodeTime {
   }
 
   private init(): void {
+    const proxyUrl = vscode.workspace.getConfiguration('codetime').get<string>('proxy')
+      || process.env.HTTPS_PROXY || process.env.HTTP_PROXY || process.env.https_proxy || process.env.http_proxy
+    this.out.appendLine(`[Init] proxy=${proxyUrl || '(none)'}`)
+    this.out.appendLine(`[Init] serverEntrypoint=${vscode.workspace.getConfiguration('codetime').serverEntrypoint}`)
+    this.out.appendLine(`[Init] token=${this.token ? '***' + this.token.slice(-4) : '(empty)'}`)
+
     this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Initializing...')}`
     this.statusBar.show()
     this.setupEventListeners()
     this.getCurrentDuration()
     this.inter = setInterval(() => {
       this.getCurrentDuration()
-      // TODO: Upload Local Data
-      // this.uploadLocalData();
     }, 60 * 1000)
   }
 
@@ -219,20 +354,13 @@ export class CodeTime {
             this.statusBar.command = 'codetime.getToken'
             return
           }
-          this.client.post(`${vscode.workspace.getConfiguration('codetime').serverEntrypoint}/v3/users/event-log`, {
-            json: data,
-            headers: {
-              'User-Agent': 'CodeTime Client',
-              'Authorization': `Bearer ${this.token}`,
-            },
-          }).catch((error: any) => {
+          this.apiRequest('POST', '/v3/users/event-log', data).catch((error: any) => {
             if (error.response?.statusCode === 401) {
               this.handleAuthError()
             }
             else {
               this.out.appendLine(`Error: ${error}`)
             }
-            // TODO: Append Data To Local
           })
         }
       }
@@ -281,12 +409,11 @@ export class CodeTime {
     this.statusBar.command = 'codetime.toDashboard'
     this.statusBar.tooltip = vscode.l10n.t('CodeTime: Head to the dashboard for statistics')
     const minutes = getMinutes(key)
-    this.client.get(`${vscode.workspace.getConfiguration('codetime').serverEntrypoint}/v3/users/self/minutes?minutes=${minutes}`, {
-      headers: {
-        'User-Agent': 'CodeTime Client',
-        'Authorization': `Bearer ${this.token}`,
-      },
-    }).then(async (res: any) => {
+    const proxyUrl = vscode.workspace.getConfiguration('codetime').get<string>('proxy')
+      || process.env.HTTPS_PROXY || process.env.HTTP_PROXY || process.env.https_proxy || process.env.http_proxy
+    const serverUrl = vscode.workspace.getConfiguration('codetime').serverEntrypoint
+    this.out.appendLine(`[Duration] GET ${serverUrl}/v3/users/self/minutes?minutes=${minutes} proxy=${proxyUrl || '(none)'}`)
+    this.apiRequest('GET', `/v3/users/self/minutes?minutes=${minutes}`).then(async (res: any) => {
       const data = JSON.parse(res.body)
       const { minutes } = data
       this.out.appendLine(`Current duration: ${minutes} minutes`)
@@ -301,7 +428,8 @@ export class CodeTime {
         this.handleAuthError()
       }
       else {
-        this.out.appendLine(`Network error: ${error.message || error}`)
+        this.out.appendLine(`[Duration] Network error: ${error.message || error}`)
+        if (error.code) this.out.appendLine(`[Duration] Error code: ${error.code}`)
         this.statusBar.text = `$(clock) ${vscode.l10n.t('CodeTime: Network Error')}`
         this.statusBar.tooltip = vscode.l10n.t('CodeTime: Network connection failed')
         this.statusBar.command = 'codetime.toDashboard'
