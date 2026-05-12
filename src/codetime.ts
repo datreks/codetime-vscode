@@ -89,9 +89,10 @@ export class CodeTime {
 
       const finish = (parsed: { statusCode: number, body: string }) => {
         this.out.appendLine(`[Req] ${parsed.statusCode} after ${Date.now() - startTime}ms`)
-        if (parsed.statusCode === 401) {
-          const err = new Error('Unauthorized') as Error & { response: { statusCode: number } }
-          err.response = { statusCode: 401 }
+        if (parsed.statusCode >= 400) {
+          const message = parsed.statusCode === 401 ? 'Unauthorized' : `HTTP ${parsed.statusCode}`
+          const err = new Error(message) as Error & { response: { statusCode: number, body: string } }
+          err.response = { statusCode: parsed.statusCode, body: parsed.body }
           reject(err)
           return
         }
@@ -131,7 +132,16 @@ export class CodeTime {
       }
 
       // With proxy: open TCP/TLS to proxy, then CONNECT (HTTPS target) or absolute-form (HTTP target)
-      const proxyUrlParsed = new URL(proxy)
+      let proxyUrlParsed: URL
+      try {
+        proxyUrlParsed = new URL(proxy)
+      }
+      catch {
+        const error = new Error(`Invalid proxy URL: "${this.redactUrlForLogging(proxy)}". Expected format: http://host:port or https://host:port.`)
+        this.out.appendLine(`[Req] invalid proxy configuration: ${error.message}`)
+        reject(error)
+        return
+      }
       if (proxyUrlParsed.protocol !== 'http:' && proxyUrlParsed.protocol !== 'https:') {
         const error = new Error(`Unsupported proxy protocol: ${proxyUrlParsed.protocol}. Only http: and https: proxies are supported.`)
         this.out.appendLine(`[Req] invalid proxy configuration: ${error.message}`)
@@ -141,6 +151,7 @@ export class CodeTime {
       const isHttpsProxy = proxyUrlParsed.protocol === 'https:'
       const proxyPort = Number(proxyUrlParsed.port) || (isHttpsProxy ? 443 : 80)
       const proxyHost = proxyUrlParsed.hostname
+      const targetAuthority = url.hostname.includes(':') ? `[${url.hostname}]:${targetPort}` : `${url.hostname}:${targetPort}`
 
       const proxyAuthHeader = proxyUrlParsed.username
         ? `Proxy-Authorization: Basic ${Buffer.from(`${decodeURIComponent(proxyUrlParsed.username)}:${decodeURIComponent(proxyUrlParsed.password)}`).toString('base64')}`
@@ -187,6 +198,7 @@ export class CodeTime {
       const onProxyReady = (proxySocket: net.Socket | tls.TLSSocket) => {
         if (!isHttpsTarget) {
           this.out.appendLine(`[Req] proxy connected, sending HTTP request (absolute form)`)
+          proxySocket.setTimeout(0)
           writeRequestAndRead(
             proxySocket,
             `${method} ${url.toString()} HTTP/1.1`,
@@ -197,8 +209,8 @@ export class CodeTime {
 
         this.out.appendLine(`[Req] proxy connected, sending CONNECT`)
         const connectLines = [
-          `CONNECT ${url.hostname}:${targetPort} HTTP/1.1`,
-          `Host: ${url.hostname}:${targetPort}`,
+          `CONNECT ${targetAuthority} HTTP/1.1`,
+          `Host: ${targetAuthority}`,
           ...(proxyAuthHeader ? [proxyAuthHeader] : []),
           'Proxy-Connection: keep-alive',
           '',
@@ -223,6 +235,7 @@ export class CodeTime {
             reject(new Error(`Proxy CONNECT failed: ${statusLine}`))
             return
           }
+          proxySocket.setTimeout(0)
           const residue = connectBuf.slice(idx + 4)
           if (residue.length > 0) {
             proxySocket.unshift(residue)
