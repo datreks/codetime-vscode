@@ -85,7 +85,7 @@ export class CodeTime {
 
     return new Promise((resolve, reject) => {
       const startTime = Date.now()
-      this.out.appendLine(`[Req] ${method} ${path} proxy=${proxy || 'none'}`)
+      this.out.appendLine(`[Req] ${method} ${path} proxy=${proxy ? this.redactUrlForLogging(proxy) : 'none'}`)
 
       const finish = (parsed: { statusCode: number, body: string }) => {
         this.out.appendLine(`[Req] ${parsed.statusCode} after ${Date.now() - startTime}ms`)
@@ -159,9 +159,15 @@ export class CodeTime {
           payload || '',
         ]
         socket.write(lines.join('\r\n'))
+
+        const requestTimeout = setTimeout(() => {
+          socket.destroy(new Error('request timeout'))
+        }, 30_000)
+
         const chunks: Buffer[] = []
         socket.on('data', (chunk: Buffer) => chunks.push(chunk))
         socket.on('end', () => {
+          clearTimeout(requestTimeout)
           socket.destroy()
           try {
             finish(parseHttpResponse(Buffer.concat(chunks)))
@@ -172,6 +178,7 @@ export class CodeTime {
           }
         })
         socket.on('error', (e: any) => {
+          clearTimeout(requestTimeout)
           this.out.appendLine(`[Req] socket error: ${e.message}`)
           reject(e)
         })
@@ -180,7 +187,6 @@ export class CodeTime {
       const onProxyReady = (proxySocket: net.Socket | tls.TLSSocket) => {
         if (!isHttpsTarget) {
           this.out.appendLine(`[Req] proxy connected, sending HTTP request (absolute form)`)
-          proxySocket.setTimeout(0)
           writeRequestAndRead(
             proxySocket,
             `${method} ${url.toString()} HTTP/1.1`,
@@ -217,7 +223,6 @@ export class CodeTime {
             reject(new Error(`Proxy CONNECT failed: ${statusLine}`))
             return
           }
-          proxySocket.setTimeout(0)
           const residue = connectBuf.slice(idx + 4)
           if (residue.length > 0) {
             proxySocket.unshift(residue)
