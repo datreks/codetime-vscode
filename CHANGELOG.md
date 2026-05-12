@@ -1,3 +1,11 @@
+## v0.14.0
+
+[v0.13.4...v0.14.0](https://github.com/datreks/codetime-vscode/compare/v0.13.4...v0.14.0)
+
+### :sparkles: Features
+
+- add proxy support for API requests (#47) - By [Alex Beng](mailto:30763045+Alex-Beng@users.noreply.github.com), [Copilot Autofix powered by AI](mailto:175728472+Copilot@users.noreply.github.com), [Claude Opus 4.7 (1M context)](mailto:noreply@anthropic.com), [Jannchie](mailto:jannchie@gmail.com), [Copilot Autofix powered by AI](mailto:175728472+Copilot@users.noreply.github.com) and [Claude Opus 4.7 (1M context)](mailto:noreply@anthropic.com) in [bd0ee26](https://github.com/datreks/codetime-vscode/commit/bd0ee26)
+
 ## v0.13.4
 
 [v0.13.3...v0.13.4](https://github.com/datreks/codetime-vscode/compare/v0.13.3...v0.13.4)
