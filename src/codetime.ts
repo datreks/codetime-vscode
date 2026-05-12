@@ -132,6 +132,12 @@ export class CodeTime {
 
       // With proxy: open TCP/TLS to proxy, then CONNECT (HTTPS target) or absolute-form (HTTP target)
       const proxyUrlParsed = new URL(proxy)
+      if (proxyUrlParsed.protocol !== 'http:' && proxyUrlParsed.protocol !== 'https:') {
+        const error = new Error(`Unsupported proxy protocol: ${proxyUrlParsed.protocol}. Only http: and https: proxies are supported.`)
+        this.out.appendLine(`[Req] invalid proxy configuration: ${error.message}`)
+        reject(error)
+        return
+      }
       const isHttpsProxy = proxyUrlParsed.protocol === 'https:'
       const proxyPort = Number(proxyUrlParsed.port) || (isHttpsProxy ? 443 : 80)
       const proxyHost = proxyUrlParsed.hostname
@@ -267,8 +273,27 @@ export class CodeTime {
     }
   }
 
+  private redactUrlForLogging(url?: string): string {
+    if (!url) {
+      return '(none)'
+    }
+
+    try {
+      const parsed = new URL(url)
+      parsed.username = ''
+      parsed.password = ''
+      parsed.pathname = ''
+      parsed.search = ''
+      parsed.hash = ''
+      return `${parsed.protocol}//${parsed.host}`
+    }
+    catch {
+      return '(configured)'
+    }
+  }
+
   private init(): void {
-    this.out.appendLine(`[Init] proxy=${this.getProxyUrl() || '(none)'}`)
+    this.out.appendLine(`[Init] proxy=${this.redactUrlForLogging(this.getProxyUrl())}`)
     this.out.appendLine(`[Init] serverEntrypoint=${vscode.workspace.getConfiguration('codetime').serverEntrypoint}`)
     this.out.appendLine(`[Init] token=${this.token ? `***${this.token.slice(-4)}` : '(empty)'}`)
 
