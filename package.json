@@ -68,6 +68,11 @@
           "default": "https://api.codetime.dev",
           "description": "%config.serverEntrypoint.description%"
         },
+        "codetime.proxy": {
+          "type": "string",
+          "default": "",
+          "description": "%config.proxy.description%"
+        },
         "codetime.displayLanguage.title": {
           "type": "string",
           "default": "Auto",
@@ -128,7 +133,6 @@
     "@vscode/l10n": "^0.0.18",
     "@vscode/test-electron": "^2.5.2",
     "date-fns": "^4.1.0",
-    "got": "14.4.7",
     "os-name": "^6.1.0",
     "uuid": "^11.1.0"
   },
@@ -136,7 +140,6 @@
     "@jannchie/eslint-config": "^3.6.1",
     "@types/date-fns": "^2.6.3",
     "@types/glob": "^9.0.0",
-    "@types/got": "^9.6.12",
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.0.15",
     "@types/vscode": "^1.99.0",
