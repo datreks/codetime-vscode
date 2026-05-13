@@ -1,8 +1,8 @@
-# CodeTime
+# Code Time
 
-[![CodeTime badge](https://img.shields.io/endpoint?style=social&url=https%3A%2F%2Fapi.codetime.dev%2Fshield%3Fid%3D2%26project%3Dcodetime-vscode%26in%3D0)](https://codetime.dev)
-![rating](https://img.shields.io/visual-studio-marketplace/stars/Jannchie.codetime)
-![installs](https://img.shields.io/visual-studio-marketplace/i/Jannchie.codetime)
+[![CodeTime Badge](https://shields.jannchie.com/endpoint?style=social&color=0284c7&url=https%3A%2F%2Fapi.codetime.dev%2Fv3%2Fusers%2Fshield%3Fuid%3D2%26tag%3Dcodetime)](https://codetime.dev)
+![rating](https://vsmarketplacebadges.dev/rating/Jannchie.codetime.png)
+![installs](https://vsmarketplacebadges.dev/installs/Jannchie.codetime.png)
 
 CodeTime vscode plugin. Statistical analysis of programming time.
 
